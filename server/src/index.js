@@ -14,7 +14,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: join(__dirname, '../../.env') });
 
 const app = express();
-const PORT = process.env.SERVER_PORT || 8899;
+const PORT = process.env.SERVER_PORT || process.env.PORT || 8899;
 
 // ─── Middleware ────────────────────────────────────────────────────────────
 app.use(cors({ origin: '*' }));
@@ -40,12 +40,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ─── Comments proxy (YouTube Data API) ────────────────────────────────────
+// ─── Comments proxy ───────────────────────────────────────────────────────
 app.get('/api/comments/:videoId', async (req, res) => {
   const { videoId } = req.params;
-  const apiKey = process.env.YOUTUBE_API_KEY_SERVER || process.env.GEMINI_API_KEY;
-  // Note: YouTube Data API v3 uses a different key - the OAuth token
-  // For now return empty with a note
   res.json({
     videoId,
     comments: [],
@@ -53,9 +50,14 @@ app.get('/api/comments/:videoId', async (req, res) => {
   });
 });
 
-// ─── Start ─────────────────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`\n${'─'.repeat(50)}`);
-  console.log(`  Shorts Factory Server  →  http://localhost:${PORT}`);
-  console.log(`${'─'.repeat(50)}\n`);
-});
+// Export app for serverless Vercel function
+export default app;
+
+// Listen only when run directly (not serverless)
+if (process.env.NODE_ENV !== 'production' || process.env.IS_LOCAL === 'true') {
+  app.listen(PORT, () => {
+    console.log(`\n${'─'.repeat(50)}`);
+    console.log(`  Shorts Factory Server  →  http://localhost:${PORT}`);
+    console.log(`${'─'.repeat(50)}\n`);
+  });
+}
