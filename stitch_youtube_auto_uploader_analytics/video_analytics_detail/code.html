@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Video Analytics | Creator Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#ffdad6",
+                    "inverse-on-surface": "#313030",
+                    "surface-container-lowest": "#0e0e0e",
+                    "tertiary": "#ffb95f",
+                    "on-primary-fixed-variant": "#930100",
+                    "on-tertiary-container": "#3e2400",
+                    "surface-variant": "#353534",
+                    "on-background": "#e5e2e1",
+                    "surface-container-high": "#2a2a2a",
+                    "secondary": "#4edea3",
+                    "background": "#131313",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-secondary-container": "#00311f",
+                    "on-secondary-fixed-variant": "#005236",
+                    "outline": "#b18780",
+                    "inverse-primary": "#c00100",
+                    "inverse-surface": "#e5e2e1",
+                    "surface-tint": "#ffb4a8",
+                    "on-primary": "#690100",
+                    "surface-container-highest": "#353534",
+                    "primary-fixed-dim": "#ffb4a8",
+                    "on-error": "#690005",
+                    "surface": "#131313",
+                    "secondary-fixed": "#6ffbbe",
+                    "surface-container": "#201f1f",
+                    "on-surface-variant": "#ebbbb4",
+                    "primary": "#ffb4a8",
+                    "secondary-container": "#00a572",
+                    "surface-bright": "#3a3939",
+                    "secondary-fixed-dim": "#4edea3",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "primary-fixed": "#ffdad4",
+                    "on-primary-fixed": "#410000",
+                    "on-primary-container": "#5c0000",
+                    "tertiary-container": "#ca8100",
+                    "error-container": "#93000a",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-secondary-fixed": "#002113",
+                    "on-tertiary-fixed": "#2a1700",
+                    "primary-container": "#ff5540",
+                    "on-secondary": "#003824",
+                    "surface-dim": "#131313",
+                    "error": "#ffb4ab",
+                    "on-tertiary": "#472a00",
+                    "outline-variant": "#603e39",
+                    "surface-container-low": "#1c1b1b",
+                    "on-surface": "#e5e2e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "gutter": "16px",
+                    "sidebar-width": "260px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "container-max": "1440px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "headline-md-mobile": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+        .chart-gradient {
+            background: linear-gradient(to bottom, rgba(255, 180, 168, 0.15) 0%, rgba(255, 180, 168, 0) 100%);
+        }
+        .sidebar-active-indicator {
+            position: absolute;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #ff5540;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col w-sidebar-width border-r border-white/10 bg-background z-50">
+<div class="px-lg py-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Creator Engine</h1>
+<p class="text-on-surface-variant font-body-sm text-body-sm opacity-60">v2.4.0 Stable</p>
+</div>
+<nav class="flex-1 space-y-base px-sm">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98] group" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<div class="relative">
+<div class="sidebar-active-indicator"></div>
+<a class="text-primary font-bold flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">video_library</span>
+<span class="font-body-md text-body-md">Videos</span>
+</a>
+</div>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">auto_mode</span>
+<span class="font-body-md text-body-md">Automation</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">history</span>
+<span class="font-body-md text-body-md">History</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="p-lg">
+<button class="w-full bg-primary-container text-on-primary-container font-bold py-md rounded-lg active:scale-95 transition-transform">
+                New Automation
+            </button>
+</div>
+<footer class="mt-auto p-sm space-y-base border-t border-white/5">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-body-md text-body-md">Sign Out</span>
+</a>
+</footer>
+</aside>
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 right-0 h-16 ml-sidebar-width w-[calc(100%-theme(spacing.sidebar-width))] flex justify-between items-center px-lg bg-surface/80 backdrop-blur-xl border-b border-white/5 z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container border border-white/10 rounded-lg py-sm pl-10 text-body-md focus:outline-none focus:border-primary transition-colors" placeholder="Search analytics, files, or creators..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional close-up studio portrait of a digital creator with creative lighting in a modern workspace. The lighting features soft cinematic rim lights and a deep dark-mode aesthetic consistent with high-end tech branding. The expression is focused and capable, conveying a sense of mastery over digital content pipelines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQkmhgyMVditnVmD37nvmkIM2-ghJsfzTnQNUmeFoLVDBuKZrfRvOAWwCYPvgTCMjQQJ_bq5hy00aAeK8wmXOcch6dHmKe6BKErh-k7fQvfsRssJGsx-NTKh8d5mREJFYAapZgKwohOTvrra5Hmk2pK-f-8siKcbXX-yDqQCJLkZ5arH7pcXSSCBgTIzv1MBTDOPkuH0_GRVsqZjpa9JdyH-Io4cEAkY6TpdqL5S6OYWLkmyb_B5MSVw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width mt-16 p-lg max-w-container-max mx-auto">
+<!-- Video Preview Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg mb-lg">
+<div class="lg:col-span-2 relative group">
+<div class="aspect-video w-full rounded-xl overflow-hidden glass-panel relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A high-end cinematic thumbnail image featuring a sleek, futuristic interface representing AI content generation. The visual style is minimal and sophisticated, using deep charcoal tones and vibrant primary red accents. Glowing nodes and data structures emerge from a central point, symbolizing the future of technology and artificial intelligence in creative fields. The atmosphere is professional and visionary." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6Vy1eSgcFqOB1gqslYYJZWwnjC5ccjJi1ilQMgaLtC6iPadbG87HMkMdSE0cStgyh-ipjzpvtGkrKvRVmLP_SU2Ai4R2hV8poAU6K8uEaEUtTbk0Wm0RGItnDro8oeGujzppk7cYjWY-vlxGfksnF_WuMktEtjCPuUl9uzPl0JmmgFKL4fQnnQqvIfz2gtDu3SuinbIzkU0nAuAbmlWtZapO3FY00qfGzZDHniCQO9_zjGClj6Ttl4w"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-lg">
+<span class="bg-primary text-white text-label-caps px-sm py-xs mb-sm inline-block rounded w-fit">NOW TRENDING</span>
+<h2 class="font-display-lg text-display-lg text-white max-w-2xl leading-tight">The Future of AI Content Generation</h2>
+<div class="flex items-center space-x-md mt-sm text-on-surface-variant font-data-mono text-data-mono">
+<span>Uploaded 4 days ago</span>
+<span>•</span>
+<span class="text-secondary">LIVE</span>
+</div>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-lg flex flex-col">
+<h3 class="font-headline-sm text-headline-sm mb-md">Performance Summary</h3>
+<div class="space-y-lg flex-1">
+<div class="flex items-start justify-between border-b border-white/5 pb-md">
+<div>
+<p class="text-on-surface-variant text-label-caps mb-xs uppercase">Overall Rank</p>
+<p class="font-display-lg text-display-lg text-primary">#1 <span class="text-body-md font-normal text-on-surface-variant">/ 10</span></p>
+</div>
+<span class="material-symbols-outlined text-secondary">trending_up</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-body-sm mb-md">This video is performing 42% better than your average content in the first 48 hours.</p>
+<div class="space-y-sm">
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">Impressions</span>
+<span class="font-data-mono">1,240,812</span>
+</div>
+<div class="w-full bg-white/5 h-1 rounded-full">
+<div class="bg-primary h-full rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-auto w-full py-md border border-white/10 rounded-lg font-body-md text-on-surface-variant hover:bg-white/5 transition-colors">
+                    Detailed Report
+                </button>
+</div>
+</div>
+<!-- Key Metrics Row -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-lg mb-lg">
+<div class="glass-panel p-lg rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant">visibility</span>
+<span class="text-secondary font-data-mono text-body-sm">+12.4%</span>
+</div>
+<p class="text-on-surface-variant text-label-caps mb-xs uppercase">Total Views</p>
+<p class="font-headline-md text-headline-md font-data-mono">482,901</p>
+</div>
+<div class="glass-panel p-lg rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant">ads_click</span>
+<span class="text-secondary font-data-mono text-body-sm">+2.1%</span>
+</div>
+<p class="text-on-surface-variant text-label-caps mb-xs uppercase">Click-Through Rate</p>
+<p class="font-headline-md text-headline-md font-data-mono">8.42%</p>
+</div>
+<div class="glass-panel p-lg rounded-xl">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-on-surface-variant">timer</span>
+<span class="text-error font-data-mono text-body-sm">-0:12</span>
+</div>
+<p class="text-on-surface-variant text-label-caps mb-xs uppercase">Avg. View Duration</p>
+<p class="font-headline-md text-headline-md font-data-mono">6:45</p>
+</div>
+<div class="glass-panel p-lg rounded-xl border-primary/20">
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary">payments</span>
+<span class="text-secondary font-data-mono text-body-sm">+22%</span>
+</div>
+<p class="text-on-surface-variant text-label-caps mb-xs uppercase">Estimated Revenue</p>
+<p class="font-headline-md text-headline-md font-data-mono">$3,120.40</p>
+</div>
+</div>
+<!-- Audience Retention Graph -->
+<div class="glass-panel rounded-xl p-lg mb-lg relative overflow-hidden">
+<div class="flex justify-between items-center mb-xl">
+<div>
+<h3 class="font-headline-sm text-headline-sm">Audience Retention</h3>
+<p class="text-on-surface-variant text-body-sm">Tracking drop-off points and engagement spikes</p>
+</div>
+<div class="flex space-x-sm">
+<button class="px-md py-sm bg-white/5 rounded-lg text-body-sm border border-white/5">Relative</button>
+<button class="px-md py-sm bg-primary/10 text-primary border border-primary/20 rounded-lg text-body-sm">Absolute</button>
+</div>
+</div>
+<div class="h-64 w-full relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-5">
+<div class="w-full h-[1px] bg-white"></div>
+<div class="w-full h-[1px] bg-white"></div>
+<div class="w-full h-[1px] bg-white"></div>
+<div class="w-full h-[1px] bg-white"></div>
+</div>
+<!-- SVG Graph -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 100">
+<path class="opacity-50" d="M0,20 C100,20 150,35 250,30 C350,25 400,60 500,55 C600,50 650,40 750,45 C850,50 950,85 1000,90 L1000,100 L0,100 Z" fill="url(#retentionGradient)"></path>
+<path d="M0,20 C100,20 150,35 250,30 C350,25 400,60 500,55 C600,50 650,40 750,45 C850,50 950,85 1000,90" fill="none" stroke="#ffb4a8" stroke-width="2" vector-effect="non-scaling-stroke"></path>
+<defs>
+<lineargradient id="retentionGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffb4a8" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#ffb4a8" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+</svg>
+<!-- Annotation -->
+<div class="absolute top-[40%] left-[25%] -translate-x-1/2">
+<div class="flex flex-col items-center">
+<div class="w-[1px] h-12 bg-white/20"></div>
+<div class="bg-surface-container border border-white/10 p-sm rounded shadow-lg">
+<p class="text-label-caps text-secondary">RETENTION SPIKE</p>
+<p class="text-body-sm font-data-mono">02:45 • 74%</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex justify-between mt-md font-data-mono text-body-sm text-on-surface-variant">
+<span>0:00</span>
+<span>5:00</span>
+<span>10:00</span>
+<span>15:00</span>
+<span>20:12</span>
+</div>
+</div>
+<!-- Real-time and Traffic Sources -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<div class="glass-panel rounded-xl p-lg">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center">
+<span class="w-2 h-2 bg-secondary rounded-full mr-sm animate-pulse"></span>
+                        Real-time Stats
+                    </h3>
+<p class="text-on-surface-variant font-data-mono text-body-sm">Last 48 hours</p>
+</div>
+<div class="h-48 flex items-end justify-between space-x-base">
+<!-- Random Bar Graph -->
+<div class="bg-primary/20 w-full h-[60%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer" title="12,400 views"></div>
+<div class="bg-primary/20 w-full h-[45%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[75%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[90%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[55%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[30%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[65%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[82%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[40%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[95%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[50%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+<div class="bg-primary/20 w-full h-[70%] rounded-t-sm hover:bg-primary transition-colors cursor-pointer"></div>
+</div>
+<div class="flex justify-between mt-md">
+<div class="text-center">
+<p class="font-headline-md text-headline-md font-data-mono">14,281</p>
+<p class="text-on-surface-variant text-label-caps">VIEWS PER HOUR</p>
+</div>
+<div class="text-center">
+<p class="font-headline-md text-headline-md font-data-mono">1,102</p>
+<p class="text-on-surface-variant text-label-caps">SHARES</p>
+</div>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-lg">Top Traffic Sources</h3>
+<div class="space-y-md">
+<div class="group">
+<div class="flex justify-between text-body-md mb-xs">
+<span class="text-on-surface">YouTube Search</span>
+<span class="font-data-mono">42.4%</span>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" style="width: 42.4%"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-body-md mb-xs">
+<span class="text-on-surface">Suggested Videos</span>
+<span class="font-data-mono">28.1%</span>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" style="width: 28.1%"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-body-md mb-xs">
+<span class="text-on-surface">External (X, LinkedIn)</span>
+<span class="font-data-mono">15.5%</span>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" style="width: 15.5%"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between text-body-md mb-xs">
+<span class="text-on-surface">Browse Features</span>
+<span class="font-data-mono">14.0%</span>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-1000" style="width: 14%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('mouseenter', () => {
+                panel.style.borderColor = 'rgba(255, 180, 168, 0.3)';
+            });
+            panel.addEventListener('mouseleave', () => {
+                panel.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            });
+        });
+    </script>
+</body></html>

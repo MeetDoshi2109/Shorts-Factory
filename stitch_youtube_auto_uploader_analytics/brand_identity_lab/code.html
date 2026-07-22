@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Brand Identity Lab | Creator Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#4edea3",
+                    "surface-container-low": "#1c1b1b",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-background": "#e5e2e1",
+                    "on-primary-fixed-variant": "#930100",
+                    "outline": "#b18780",
+                    "on-tertiary": "#472a00",
+                    "on-surface": "#e5e2e1",
+                    "surface-dim": "#131313",
+                    "primary-fixed": "#ffdad4",
+                    "surface-bright": "#3a3939",
+                    "primary-container": "#ff5540",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-container-highest": "#353534",
+                    "surface-container-lowest": "#0e0e0e",
+                    "secondary": "#4edea3",
+                    "outline-variant": "#603e39",
+                    "on-primary": "#690100",
+                    "surface-container-high": "#2a2a2a",
+                    "inverse-primary": "#c00100",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#ffb4a8",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffb95f",
+                    "surface-tint": "#ffb4a8",
+                    "on-primary-fixed": "#410000",
+                    "on-secondary-fixed-variant": "#005236",
+                    "surface-container": "#201f1f",
+                    "primary": "#ffb4a8",
+                    "on-primary-container": "#5c0000",
+                    "secondary-fixed": "#6ffbbe",
+                    "secondary-container": "#00a572",
+                    "on-error-container": "#ffdad6",
+                    "surface-variant": "#353534",
+                    "error-container": "#93000a",
+                    "on-secondary-container": "#00311f",
+                    "on-secondary": "#003824",
+                    "inverse-surface": "#e5e2e1",
+                    "on-tertiary-container": "#3e2400",
+                    "surface": "#131313",
+                    "inverse-on-surface": "#313030",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-secondary-fixed": "#002113",
+                    "background": "#131313",
+                    "tertiary-container": "#ca8100",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-surface-variant": "#ebbbb4",
+                    "yt-red": "#FF0000"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "md": "16px",
+                    "xs": "4px",
+                    "container-max": "1440px",
+                    "lg": "24px",
+                    "sidebar-width": "260px",
+                    "sm": "8px",
+                    "xl": "40px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-md-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none;
+        }
+        .sidebar-active-indicator {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2px;
+            height: 60%;
+            background-color: #FF0000;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 2px;
+        }
+        .input-glow:focus {
+            border-color: #FF0000;
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-background overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col w-sidebar-width border-r border-white/10 bg-background z-50">
+<div class="px-lg py-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-yt-red tracking-tight">Creator Engine</h1>
+<p class="text-on-surface-variant font-body-sm text-body-sm opacity-50">v2.4.0 Stable</p>
+</div>
+<nav class="flex-1 px-md space-y-xs overflow-y-auto custom-scrollbar">
+<a class="group relative flex items-center px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="group relative flex items-center px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-md">video_library</span>
+<span class="font-body-md text-body-md">Videos</span>
+</a>
+<a class="group relative flex items-center px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-md">auto_mode</span>
+<span class="font-body-md text-body-md">Automation</span>
+</a>
+<a class="group relative flex items-center px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-md">history</span>
+<span class="font-body-md text-body-md">History</span>
+</a>
+<!-- Active State: Settings (Where Lab lives) -->
+<a class="group relative flex items-center px-lg py-sm text-yt-red font-bold bg-white/5 transition-colors duration-200" href="#">
+<div class="sidebar-active-indicator"></div>
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</nav>
+<div class="p-lg border-t border-white/5 space-y-xs">
+<a class="flex items-center px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="flex items-center px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-body-md text-body-md">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="h-16 flex justify-between items-center px-lg bg-surface/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40">
+<div class="flex items-center gap-md flex-1">
+<div class="relative w-96 max-w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border border-white/10 rounded-lg py-1.5 pl-10 pr-4 text-body-sm font-body-sm focus:border-yt-red focus:ring-0 transition-all" placeholder="Search Lab assets..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md">
+<button class="text-on-surface-variant hover:text-yt-red transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-yt-red transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+</div>
+<div class="h-8 w-8 rounded-full bg-surface-container-highest border border-white/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a digital creator with creative lighting in a dark, tech-focused environment. High contrast, sharp focus, cinematic dark mode aesthetic with red accent light reflecting on their glasses." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFGaBNdLRp-QX97OeP23DmUG9aaoSD2oDz4BKLb6PAmX-KaEz77gbtLsH5x3or3TtqkroMbBUjs-xBYQM1WzFxNGdm0GLFsUq3ggXZW2GxgzlvtG7ZgN-XnqfFUfj3UF0OEopYPrIaiZObO7l22PcVI6ju5WIa6W7ntl3ioNM8RjwEMiuSx8ejC_M-jbNwWSEXucn6hiaF0miktCh4NK3u3qXGlIJ8wew_x77IOVY5_YQ25ba1smvflg"/>
+</div>
+</div>
+</header>
+<!-- Canvas Area -->
+<div class="flex-1 overflow-y-auto p-lg custom-scrollbar">
+<div class="max-w-[1440px] mx-auto space-y-lg">
+<!-- Page Header -->
+<div class="flex justify-between items-end pb-4">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Brand Identity Lab</h2>
+<p class="text-on-surface-variant font-body-md text-body-md">Configure visual core assets for unified channel propagation.</p>
+</div>
+<button class="bg-yt-red text-white px-lg py-sm rounded-lg font-headline-sm text-headline-sm hover:brightness-110 active:scale-[0.98] transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">publish</span>
+                        Deploy Brand
+                    </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Color Palette Manager (Span 8) -->
+<section class="col-span-8 glass-panel rounded-xl p-lg">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-headline-sm text-headline-sm">Color System</h3>
+<button class="text-yt-red font-label-caps text-label-caps flex items-center gap-xs uppercase tracking-widest">
+<span class="material-symbols-outlined text-[14px]">edit</span> Edit System
+                            </button>
+</div>
+<div class="grid grid-cols-4 gap-md">
+<!-- Primary Red -->
+<div class="space-y-sm">
+<div class="h-32 w-full bg-yt-red rounded-lg flex items-end p-md group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"></div>
+<span class="text-white font-data-mono text-data-mono z-10">#FF0000</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-semibold">Primary Accent</p>
+<p class="font-label-caps text-label-caps opacity-50 uppercase">YouTube Red</p>
+</div>
+</div>
+<!-- Secondary Obsidian -->
+<div class="space-y-sm">
+<div class="h-32 w-full bg-[#050505] border border-white/10 rounded-lg flex items-end p-md group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"></div>
+<span class="text-white font-data-mono text-data-mono z-10">#050505</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-semibold">Base Surface</p>
+<p class="font-label-caps text-label-caps opacity-50 uppercase">Obsidian Core</p>
+</div>
+</div>
+<!-- Tertiary Emerald -->
+<div class="space-y-sm">
+<div class="h-32 w-full bg-secondary-container rounded-lg flex items-end p-md group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"></div>
+<span class="text-white font-data-mono text-data-mono z-10">#00A572</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-semibold">Success State</p>
+<p class="font-label-caps text-label-caps opacity-50 uppercase">Matrix Emerald</p>
+</div>
+</div>
+<!-- Neutral Gray -->
+<div class="space-y-sm">
+<div class="h-32 w-full bg-surface-container-highest rounded-lg flex items-end p-md group cursor-pointer relative overflow-hidden">
+<div class="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"></div>
+<span class="text-white font-data-mono text-data-mono z-10">#353534</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm font-semibold">Utility Neutral</p>
+<p class="font-label-caps text-label-caps opacity-50 uppercase">Charcoal</p>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Configurator Summary (Span 4) -->
+<section class="col-span-4 glass-panel rounded-xl p-lg flex flex-col">
+<h3 class="font-headline-sm text-headline-sm mb-md">Asset Health</h3>
+<div class="flex-1 flex flex-col justify-center space-y-lg">
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md">Brand Consistency</span>
+<span class="font-data-mono text-data-mono text-secondary-fixed-dim">98%</span>
+</div>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-secondary-fixed-dim h-full w-[98%]"></div>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-white/5 p-md rounded-lg text-center">
+<p class="font-headline-sm text-headline-sm">24</p>
+<p class="font-label-caps text-label-caps opacity-50 uppercase">Active Logos</p>
+</div>
+<div class="bg-white/5 p-md rounded-lg text-center">
+<p class="font-headline-sm text-headline-sm">112</p>
+<p class="font-label-caps text-label-caps opacity-50 uppercase">Styles</p>
+</div>
+</div>
+</div>
+<button class="mt-xl w-full border border-white/10 py-sm rounded-lg font-body-md text-body-md hover:bg-white/5 transition-all">
+                            Run Global Audit
+                        </button>
+</section>
+<!-- Logo Variations Gallery (Span 12) -->
+<section class="col-span-12 glass-panel rounded-xl p-lg">
+<div class="flex justify-between items-center mb-xl">
+<div>
+<h3 class="font-headline-sm text-headline-sm">Logo Variations</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-60">High-resolution masters for all platform placements.</p>
+</div>
+<div class="flex gap-sm">
+<button class="p-sm bg-white/5 rounded-lg border border-white/10 hover:border-yt-red transition-all">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+</button>
+<button class="p-sm bg-white/5 rounded-lg border border-white/10 hover:border-yt-red transition-all">
+<span class="material-symbols-outlined text-[18px]">list</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-5 gap-md">
+<div class="aspect-square bg-[#0a0a0a] border border-white/5 rounded-xl flex items-center justify-center relative group cursor-zoom-in">
+<div class="w-24 h-24 bg-yt-red rounded-full blur-3xl opacity-20 absolute group-hover:opacity-40 transition-opacity"></div>
+<span class="font-bold text-headline-md tracking-tighter text-white z-10">CE</span>
+<div class="absolute bottom-3 left-3 px-2 py-1 bg-black/60 rounded text-[10px] font-data-mono uppercase tracking-widest border border-white/10">App Icon</div>
+</div>
+<div class="aspect-square bg-white rounded-xl flex items-center justify-center relative group cursor-zoom-in">
+<span class="font-bold text-headline-md tracking-tighter text-black">CE</span>
+<div class="absolute bottom-3 left-3 px-2 py-1 bg-white/60 rounded text-[10px] font-data-mono uppercase tracking-widest border border-black/10 text-black">Light Mode</div>
+</div>
+<div class="aspect-square bg-[#1A1A1A] border border-white/5 rounded-xl flex items-center justify-center relative group cursor-zoom-in">
+<div class="text-white text-center">
+<div class="font-bold text-headline-sm tracking-tighter mb-0">Creator</div>
+<div class="font-body-sm font-light text-[10px] tracking-[0.3em] uppercase -mt-1 opacity-50">Engine</div>
+</div>
+<div class="absolute bottom-3 left-3 px-2 py-1 bg-black/60 rounded text-[10px] font-data-mono uppercase tracking-widest border border-white/10">Horizontal</div>
+</div>
+<div class="aspect-square bg-yt-red rounded-xl flex items-center justify-center relative group cursor-zoom-in">
+<span class="font-bold text-headline-md tracking-tighter text-white">CE</span>
+<div class="absolute bottom-3 left-3 px-2 py-1 bg-black/40 rounded text-[10px] font-data-mono uppercase tracking-widest border border-white/10 text-white">Mono Red</div>
+</div>
+<div class="aspect-square border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center gap-sm hover:border-yt-red transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-yt-red transition-colors">add_circle</span>
+<span class="font-label-caps text-label-caps opacity-50">Upload New</span>
+</div>
+</div>
+</section>
+<!-- AI Thumbnail Style Config (Span 7) -->
+<section class="col-span-7 glass-panel rounded-xl p-lg">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-headline-sm text-headline-sm">AI Thumbnail DNA</h3>
+<div class="flex gap-md items-center">
+<span class="font-label-caps text-label-caps opacity-50">ACTIVE PROFILE</span>
+<select class="bg-surface-container-low border border-white/10 rounded px-sm py-1 text-xs font-data-mono focus:ring-0">
+<option>CYBERPUNK_v4</option>
+<option>MINIMAL_SOFT</option>
+<option>DARK_TECH_2</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md h-full pb-8">
+<div class="space-y-md">
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<label class="font-label-caps text-label-caps opacity-50 block mb-xs uppercase">Base Prompt Modifier</label>
+<textarea class="w-full bg-surface-container-low border border-white/10 rounded-lg p-md text-body-sm font-data-mono h-24 input-glow resize-none">cinematic lighting, ultra-modern tech aesthetic, obsidian and red neon, sharp focus, 8k resolution, extreme bokeh depth</textarea>
+</div>
+<div class="grid grid-cols-2 gap-sm">
+<div>
+<label class="font-label-caps text-label-caps opacity-50 block mb-xs uppercase">Contrast</label>
+<input class="w-full accent-yt-red" type="range"/>
+</div>
+<div>
+<label class="font-label-caps text-label-caps opacity-50 block mb-xs uppercase">Glow</label>
+<input class="w-full accent-yt-red" type="range"/>
+</div>
+</div>
+</div>
+<div class="relative group">
+<div class="w-full h-full rounded-xl overflow-hidden border border-white/10 shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="A futuristic YouTube thumbnail preview featuring high-contrast cinematic lighting with deep blacks and vibrant red neon accents. A professional technology product is showcased with sharp metallic edges and soft bokeh background. Modern dark mode aesthetic, sleek and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaGKs20DBg3Q4zhppcDvPvmWvtthxJMa77haewNtiuAyJ8Vn1lGusLLIMvpVKTstAafFWZIPonXx33_raHkeSRUM_73C335nts638E6ucvG263iSUxbA9umYwggUZ5yM_3o_lrpUasoU5ZwHapv6cph48-Bi9a4s8I00L5te4s6D0Ch4No7QPzr_SsnxazlN94n6Xv0JPRzbigfgXcN2Ms2UxJgtYQQotObItirgUbgxHWzVQvUOqzow"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-md">
+<div class="w-full">
+<div class="flex items-center gap-xs mb-xs">
+<span class="bg-yt-red text-[8px] font-bold px-1 rounded">LIVE PREVIEW</span>
+<span class="text-[8px] font-data-mono opacity-50">GEN_ID: 98221</span>
+</div>
+<p class="font-headline-sm text-body-sm line-clamp-2">How we built the world's fastest automation engine...</p>
+</div>
+</div>
+</div>
+<button class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-md px-lg py-sm rounded-full font-label-caps text-label-caps opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Regenerate
+                                </button>
+</div>
+</div>
+</section>
+<!-- Font Library (Span 5) -->
+<section class="col-span-5 glass-panel rounded-xl p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-xl">Typography Deck</h3>
+<div class="space-y-lg">
+<div class="border-b border-white/5 pb-md">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-caps text-label-caps opacity-50 uppercase">Headlines / Inter</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_forward</span>
+</div>
+<p class="text-[32px] font-bold leading-tight tracking-tight">Obsidian Flux UI</p>
+</div>
+<div class="border-b border-white/5 pb-md">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-caps text-label-caps opacity-50 uppercase">Body / Inter</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_forward</span>
+</div>
+<p class="text-body-md font-body-md opacity-80 leading-relaxed">The quick brown fox jumps over the lazy dog. Designed for readability at small scale for analytical data density.</p>
+</div>
+<div class="pb-md">
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-caps text-label-caps opacity-50 uppercase">Metrics / JetBrains Mono</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_forward</span>
+</div>
+<p class="font-data-mono text-data-mono text-xl tracking-tighter text-yt-red">1,204,558.92</p>
+</div>
+</div>
+<button class="mt-lg w-full bg-white/5 py-sm rounded-lg border border-white/10 hover:border-yt-red transition-all flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[20px]">add</span> Add Custom Family
+                        </button>
+</section>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Quick Actions -->
+<button class="fixed bottom-lg right-lg h-14 w-14 rounded-full bg-yt-red text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 group">
+<span class="material-symbols-outlined">auto_fix_high</span>
+<div class="absolute right-full mr-md py-sm px-md bg-surface-container-high rounded-lg text-label-caps text-label-caps uppercase whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity border border-white/10">
+            AI Style Refresh
+        </div>
+</button>
+<script>
+        // Subtle micro-interaction for color blocks
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('mousemove', (e) => {
+                const rect = panel.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                panel.style.setProperty('--mouse-x', `${x}px`);
+                panel.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

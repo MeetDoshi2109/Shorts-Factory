@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Channel Manager | Creator Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary": "#ffb95f",
+                        "on-primary-fixed-variant": "#930100",
+                        "on-tertiary-container": "#3e2400",
+                        "surface-variant": "#353534",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary": "#4edea3",
+                        "background": "#050505", /* Overridden for Obsidian Flux Black */
+                        "tertiary-fixed": "#ffddb8",
+                        "on-secondary-container": "#00311f",
+                        "on-secondary-fixed-variant": "#005236",
+                        "outline": "#b18780",
+                        "inverse-primary": "#c00100",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#ffb4a8",
+                        "on-primary": "#690100",
+                        "surface-container-highest": "#353534",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "on-error": "#690005",
+                        "surface": "#131313",
+                        "secondary-fixed": "#6ffbbe",
+                        "surface-container": "#201f1f",
+                        "on-surface-variant": "#ebbbb4",
+                        "primary": "#FF0000", /* Obsidian Flux Red */
+                        "secondary-container": "#00a572",
+                        "surface-bright": "#3a3939",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "primary-fixed": "#ffdad4",
+                        "on-primary-fixed": "#410000",
+                        "on-primary-container": "#5c0000",
+                        "tertiary-container": "#ca8100",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-secondary-fixed": "#002113",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary-container": "#ff5540",
+                        "on-secondary": "#003824",
+                        "surface-dim": "#131313",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#472a00",
+                        "outline-variant": "#603e39",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "sidebar-width": "260px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #050505; color: #e5e2e1; }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .active-glow {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.15);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .data-mono-font { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF0000; }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden">
+<!-- Sidebar Navigation Shell -->
+<aside class="fixed left-0 top-0 h-full flex flex-col w-sidebar-width border-r border-white/10 bg-background z-50">
+<div class="p-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">Creator Engine</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/50 mt-1">v2.4.0 Stable</p>
+</div>
+<nav class="flex-1 px-md space-y-1">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="text-primary border-l-2 border-primary font-bold flex items-center px-lg py-sm bg-white/5" href="#">
+<span class="material-symbols-outlined mr-md">video_library</span>
+<span class="font-body-md">Videos</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary">auto_mode</span>
+<span class="font-body-md">Automation</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary">history</span>
+<span class="font-body-md">History</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</nav>
+<div class="p-lg space-y-4">
+<button class="w-full bg-primary text-white font-bold py-md px-lg rounded-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2 hover:brightness-110 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+<span>New Automation</span>
+</button>
+<div class="pt-lg border-t border-white/5">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-body-md">Support</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-body-md">Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-sidebar-width right-0 h-16 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-lg border-b border-white/5 z-40">
+<div class="flex items-center gap-gutter w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-body-md focus:outline-none focus:border-primary/50 transition-all" placeholder="Search channels..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-white/10"></div>
+<div class="flex items-center gap-sm">
+<div class="text-right">
+<p class="font-body-md font-bold leading-tight">Alex Rivera</p>
+<p class="font-label-caps text-on-surface-variant">Pro Creator</p>
+</div>
+<img class="w-10 h-10 rounded-full border border-primary/30 object-cover" data-alt="A professional headshot of a creative entrepreneur in a dark, high-tech studio environment. The lighting is cinematic with subtle red rim light accents against a deep charcoal background, reflecting a high-end obsidian flux aesthetic. The subject is wearing a modern black turtleneck, looking confidently at the camera." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMlTEr_2izKZpF7loOCeJCgELPS8_CNGHrvFfaPan_eZQPN_UpL9_yPNJG0zaO24d2m2BAXN0HFLa2syFmk7Y5KRC7GDIfkk2CERDDQfX4_M3fDlElbei5TdIuTd5GacnUDts8vBjH8-kc0Ucg1RZIsyUJeze6Eq8BCidV2IkI56jHEaOvXXFmxM27aegNqxzQhja0wPXdSTneH78zIEWzZi-5JK9OKzgDJeow4gBgOPoVVpdMTzZoIg"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width pt-16 h-screen overflow-y-auto bg-background">
+<div class="max-w-[1440px] mx-auto p-xl">
+<!-- Hero Header Section -->
+<div class="flex justify-between items-end mb-xl">
+<div>
+<nav class="flex text-on-surface-variant font-label-caps mb-sm gap-2 items-center">
+<span>WORKSPACE</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-primary">CHANNELS</span>
+</nav>
+<h2 class="font-display-lg text-display-lg">Channel Manager</h2>
+<p class="text-on-surface-variant max-w-lg mt-sm">Monitor performance, synchronization status, and manage connectivity for your entire YouTube ecosystem from one centralized command hub.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg flex items-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(255,0,0,0.3)]">
+<span class="material-symbols-outlined">add_circle</span>
+<span>Add New Channel</span>
+</button>
+</div>
+<!-- Bento Grid of Channels -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Channel Card 1: TechReviewPro -->
+<div class="glass-panel rounded-xl p-lg relative overflow-hidden group hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-lg">
+<div class="flex gap-md items-center">
+<div class="w-14 h-14 rounded-xl border border-white/10 overflow-hidden shadow-inner bg-surface">
+<img class="w-full h-full object-cover" data-alt="A sleek YouTube channel avatar for a technology review brand. The logo features a minimalist metallic 'T' against a deep black background with glowing red neon circuitry patterns, adhering to the Obsidian Flux design language with high contrast and sharp edges." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHOZdgFtkF4ETkgFRRvhPUivhfCCzB5U_ji6Hh0BXM9Fl1aPtWwRA-0hwK9zWFA4Pa4TVKqFPPsOvZCSXLyBYsQwVJugWXvYwseYUiHy5mCedcAPg6QJQYDckR5FwZX3pUtqipItwWOW2W-bSxe-yUTR8E4u37Ml_5AKW2kMbX1aoS9HlU4tUwdR1e9TuP3YHVKGpiO0Ypsw-c4UKmvc53PRs4qZOc_hIEygqdURXeLB7AEZYclDSj1Q"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm">TechReviewPro</h3>
+<p class="text-on-surface-variant font-data-mono text-body-sm">@TechReviewPro</p>
+</div>
+</div>
+<div class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="font-label-caps text-[11px]">ACTIVE</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md mb-lg">
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">SUBSCRIBERS</p>
+<p class="font-data-mono text-headline-sm text-white">1.2M</p>
+</div>
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">VIDEOS</p>
+<p class="font-data-mono text-headline-sm text-white">842</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-white/5">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-background bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">schedule</span>
+</div>
+</div>
+<button class="text-primary font-label-caps flex items-center gap-1 hover:underline">
+                            MANAGE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Channel Card 2: CreativeFlow -->
+<div class="glass-panel rounded-xl p-lg relative overflow-hidden group hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-lg">
+<div class="flex gap-md items-center">
+<div class="w-14 h-14 rounded-xl border border-white/10 overflow-hidden bg-surface">
+<img class="w-full h-full object-cover" data-alt="A sophisticated YouTube avatar for a creative lifestyle channel. The design uses fluid organic shapes in deep shades of obsidian and charcoal, highlighted by a single vibrant red streak. The visual style is premium and artistic, evoking a sense of modern professional high-end digital content." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhPay7bTZiQHjKv_B_Pdv1bnS_k7WW-Qq-TnqbaAuwhusi9iOKvCZF8at8VzBKueAlAnknjq_DxWauheX-78eQzCO6-Biu3fz3hbI7dVWpZUuiQP4smAbBi0R5Iirz_zFrExuAO03Lg-booswGIntabu5vRFp3p7G-y_aPbzQaFrjTLLqZafVCRRvy9eVbSbbEaLCAzcMmGjqNmqg13Zi4ycyp0hqlZAs96kAfncDnGrQ0WmPqgAlNqQ"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm">CreativeFlow</h3>
+<p class="text-on-surface-variant font-data-mono text-body-sm">@CreativeFlow</p>
+</div>
+</div>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-caps text-[11px]">SYNCING</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md mb-lg">
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">SUBSCRIBERS</p>
+<p class="font-data-mono text-headline-sm text-white">450K</p>
+</div>
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">VIDEOS</p>
+<p class="font-data-mono text-headline-sm text-white">215</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-white/5">
+<p class="text-on-surface-variant text-[12px]">Last updated 2 mins ago</p>
+<button class="text-primary font-label-caps flex items-center gap-1 hover:underline">
+                            MANAGE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Channel Card 3: UrbanVibes -->
+<div class="glass-panel rounded-xl p-lg relative overflow-hidden group hover:border-primary/40 transition-all cursor-pointer opacity-80">
+<div class="flex items-start justify-between mb-lg">
+<div class="flex gap-md items-center">
+<div class="w-14 h-14 rounded-xl border border-white/10 overflow-hidden bg-surface">
+<img class="w-full h-full object-cover" data-alt="A minimalist YouTube profile icon for an urban lifestyle channel. Features a bold abstract geometric silhouette of a cityscape rendered in matte black and charcoal tones, with tiny red accents representing city lights. Professional, clean, and clinical design aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRbpyAVqDOOK7_6ChpfhydlfroEpRxtBafBVO1xhZZBKoVOe0XIR0UprP5w68y-HE8lKIbsY9r3VmRge1RACkjpRH1UtXrkqJGgMwlE0LvENWEvsUPIUBfJNz5c8Xx5qCOWdkGS0a9XKLGjHGQMExfx-zUR3mCjPg28GZcXrnEGckN1a5f0fpICs_bkrZYNneAMCzhrQa-k6J76Z28jmiCFKfO7Tzqu2JBf0uYzcI4rJfIlmGkyv6Rcw"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm">UrbanVibes</h3>
+<p class="text-on-surface-variant font-data-mono text-body-sm">@UrbanVibesHQ</p>
+</div>
+</div>
+<div class="bg-white/10 text-on-surface-variant px-3 py-1 rounded-full flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-on-surface-variant"></span>
+<span class="font-label-caps text-[11px]">IDLE</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md mb-lg">
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">SUBSCRIBERS</p>
+<p class="font-data-mono text-headline-sm text-white">12.8K</p>
+</div>
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">VIDEOS</p>
+<p class="font-data-mono text-headline-sm text-white">42</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-white/5">
+<p class="text-on-surface-variant text-[12px]">Last updated 4 hours ago</p>
+<button class="text-primary font-label-caps flex items-center gap-1 hover:underline">
+                            MANAGE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Channel Card 4: GameStreamX -->
+<div class="glass-panel rounded-xl p-lg relative overflow-hidden group hover:border-primary/40 transition-all cursor-pointer">
+<div class="flex items-start justify-between mb-lg">
+<div class="flex gap-md items-center">
+<div class="w-14 h-14 rounded-xl border border-white/10 overflow-hidden bg-surface">
+<img class="w-full h-full object-cover" data-alt="A high-energy gaming YouTube channel avatar. It depicts a stylized futuristic helmet in dark obsidian chrome with glowing red visors. The background is a very dark gray with subtle digital glitch effects in red, perfect for a high-volume professional gaming pipeline manager." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjNLCeu-9SsY89_-kjOBP3caP_8plWNzNC0UJ-KmFT8RA2Lvymd12kDBkTqQHr565mCse8kUNqiOM-pI9_Wrb3uVNAYX3IuJdtgHigirCj198vIyYNPaGvW3houJIWJfjDFJLSKt3j4NpMIUrT5TC94n65yPKrLuFHoqX0lIRv__sbsr7Qki1J46JFxQZnX2y0ZhVGR1T18Ebiywk_Y4mfikKDw-HfzGgBphjphtTJd07lRys5Fueikw"/>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm">GameStreamX</h3>
+<p class="text-on-surface-variant font-data-mono text-body-sm">@GS_XOfficial</p>
+</div>
+</div>
+<div class="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="font-label-caps text-[11px]">ACTIVE</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-md mb-lg">
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">SUBSCRIBERS</p>
+<p class="font-data-mono text-headline-sm text-white">2.8M</p>
+</div>
+<div class="bg-white/5 p-md rounded-lg border border-white/5">
+<p class="font-label-caps text-on-surface-variant text-[10px] mb-1">VIDEOS</p>
+<p class="font-data-mono text-headline-sm text-white">3.1K</p>
+</div>
+</div>
+<div class="flex items-center justify-between pt-md border-t border-white/5">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-sm">warning</span>
+<span class="text-[11px] font-label-caps">STORAGE LOW</span>
+</div>
+<button class="text-primary font-label-caps flex items-center gap-1 hover:underline">
+                            MANAGE <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Add New Channel Ghost Card -->
+<div class="border-2 border-dashed border-white/10 rounded-xl p-lg flex flex-col items-center justify-center text-center group hover:border-primary/50 transition-all cursor-pointer min-h-[260px]">
+<div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-md group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-[32px]">add</span>
+</div>
+<h3 class="font-headline-sm text-on-surface-variant group-hover:text-white transition-colors">Connect YouTube Channel</h3>
+<p class="text-on-surface-variant/60 text-body-sm mt-2 px-6">Authorize your Google account to start managing content and automations.</p>
+</div>
+</div>
+<!-- Dashboard Analytics Bottom Section (Asymmetric Layout) -->
+<div class="mt-xl grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="lg:col-span-2 glass-panel rounded-xl p-lg">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm">Aggregate Growth</h3>
+<div class="flex gap-md">
+<button class="text-on-surface-variant font-label-caps text-[10px] px-3 py-1 bg-white/5 rounded hover:text-primary transition-colors">WEEK</button>
+<button class="text-primary font-label-caps text-[10px] px-3 py-1 bg-primary/10 rounded">MONTH</button>
+</div>
+</div>
+<div class="h-48 flex items-end gap-2 px-md">
+<!-- Mockup Chart Bars -->
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[30%] group-hover:bg-primary/40 transition-all"></div></div>
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[45%] group-hover:bg-primary/40 transition-all"></div></div>
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[25%] group-hover:bg-primary/40 transition-all"></div></div>
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[60%] group-hover:bg-primary/40 transition-all"></div></div>
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[50%] group-hover:bg-primary/40 transition-all"></div></div>
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[85%] group-hover:bg-primary/40 transition-all"></div></div>
+<div class="flex-1 bg-white/5 rounded-t group relative"><div class="absolute bottom-0 left-0 right-0 bg-primary/20 h-[70%] group-hover:bg-primary/40 transition-all"></div></div>
+</div>
+<div class="flex justify-between mt-md font-label-caps text-[10px] text-on-surface-variant">
+<span>MAY 01</span>
+<span>MAY 07</span>
+<span>MAY 14</span>
+<span>MAY 21</span>
+<span>MAY 28</span>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-lg flex flex-col justify-between">
+<div>
+<h3 class="font-headline-sm mb-md">System Health</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-sm">API Latency</span>
+<span class="font-data-mono text-emerald-400">24ms</span>
+</div>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-emerald-400 h-full w-[95%]"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface-variant font-body-sm">Storage Usage</span>
+<span class="font-data-mono text-primary">88%</span>
+</div>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[88%]"></div>
+</div>
+</div>
+</div>
+<div class="pt-lg border-t border-white/5 mt-lg">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">security</span>
+</div>
+<div>
+<p class="font-body-sm font-bold">Encrypted Connection</p>
+<p class="text-[11px] text-on-surface-variant uppercase tracking-tighter">OAuth 2.0 Secure Access</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions for hover effects
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

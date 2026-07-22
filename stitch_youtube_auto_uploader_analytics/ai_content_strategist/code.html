@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Creator Engine | AI Content Strategist</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-red {
+            background: rgba(255, 0, 0, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-red:hover {
+            background: rgba(255, 0, 0, 0.1);
+            border-color: rgba(255, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        .text-glow {
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface-container-low": "#1c1b1b",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-background": "#e5e2e1",
+                        "on-primary-fixed-variant": "#930100",
+                        "outline": "#b18780",
+                        "on-tertiary": "#472a00",
+                        "on-surface": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "primary-fixed": "#ffdad4",
+                        "surface-bright": "#3a3939",
+                        "primary-container": "#ff5540",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-container-highest": "#353534",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary": "#4edea3",
+                        "outline-variant": "#603e39",
+                        "on-primary": "#690100",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-primary": "#c00100",
+                        "on-error": "#690005",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "error": "#ffb4ab",
+                        "tertiary": "#ffb95f",
+                        "surface-tint": "#ffb4a8",
+                        "on-primary-fixed": "#410000",
+                        "on-secondary-fixed-variant": "#005236",
+                        "surface-container": "#201f1f",
+                        "primary": "#ffb4a8",
+                        "on-primary-container": "#5c0000",
+                        "secondary-fixed": "#6ffbbe",
+                        "secondary-container": "#00a572",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#353534",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#00311f",
+                        "on-secondary": "#003824",
+                        "inverse-surface": "#e5e2e1",
+                        "on-tertiary-container": "#3e2400",
+                        "surface": "#131313",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-secondary-fixed": "#002113",
+                        "background": "#131313",
+                        "tertiary-container": "#ca8100",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-surface-variant": "#ebbbb4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "container-max": "1440px",
+                        "lg": "24px",
+                        "sidebar-width": "260px",
+                        "sm": "8px",
+                        "xl": "40px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-md-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background selection:bg-primary/30">
+<!-- SideNavBar Shell -->
+<nav class="fixed left-0 top-0 h-full flex flex-col w-sidebar-width border-r border-white/5 bg-background z-50">
+<div class="px-lg py-xl">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Creator Engine</h1>
+<p class="text-body-sm text-on-surface-variant/60">v2.4.0 Stable</p>
+</div>
+<button class="mx-lg mb-lg bg-primary-container text-on-primary-container py-sm px-md rounded-lg flex items-center justify-center gap-sm font-semibold active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">auto_mode</span>
+<span>New Automation</span>
+</button>
+<div class="flex-1 space-y-xs">
+<!-- Active: Dashboard -->
+<a class="text-primary border-l-2 border-primary font-bold flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">video_library</span>
+<span class="font-body-md text-body-md">Videos</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">auto_mode</span>
+<span class="font-body-md text-body-md">Automation</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">history</span>
+<span class="font-body-md text-body-md">History</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+<div class="mt-auto border-t border-white/5 pt-md mb-md">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-body-md text-body-md">Sign Out</span>
+</a>
+</div>
+</nav>
+<!-- TopNavBar Shell -->
+<header class="fixed top-0 right-0 h-16 flex justify-between items-center px-lg bg-surface/80 backdrop-blur-xl border-b border-white/5 z-40 w-[calc(100%-theme(spacing.sidebar-width))]">
+<div class="flex items-center gap-md w-1/2">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40">search</span>
+<input class="w-full bg-surface-container border border-white/10 rounded-lg pl-10 pr-4 py-2 text-body-sm focus:outline-none focus:border-primary/50 transition-colors" placeholder="Search insights..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="relative text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+<div class="flex items-center gap-sm pl-md border-l border-white/10">
+<div class="text-right">
+<p class="text-body-sm font-semibold">Alex Rivera</p>
+<p class="text-[10px] text-on-surface-variant/60 font-label-caps uppercase">Strategist Pro</p>
+</div>
+<img class="w-10 h-10 rounded-full border border-white/10 object-cover" data-alt="A professional headshot of a creative agency owner with a modern minimalist aesthetic, soft dramatic studio lighting with subtle red rim light, clean dark background, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-qw_HQHqRJg0NbSkFByfkNodAvyLooh_OYAZdJi9B_dZvSXRs1WkFuCTk7zyqplI90rXcD0VK_tfF4MzjKm2B_OT_MWOmeSdu4867QQm76oazirCqFeunzjbxb0i6eraJ3LhT8cZN8iORHtZuyiiwxKZG8v33qVZ5QV4IWAqvJz5kv2Tk6iw5mL5j-EDn5QLgSmXzTybzDp7srcC6WhYNdse706WQ14BHdb0GqmjcDfedw5QmP5AWQQ"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width pt-16 min-h-screen">
+<div class="max-w-[1440px] mx-auto p-lg space-y-lg">
+<!-- Hero Stats / Strategy Overview -->
+<section class="grid grid-cols-12 gap-gutter">
+<div class="col-span-12 lg:col-span-8">
+<div class="h-full p-xl rounded-xl bg-surface-container-low border border-white/5 flex flex-col justify-between relative overflow-hidden">
+
+<div class="relative z-10">
+<h2 class="font-headline-md text-headline-md mb-sm">AI Content Strategist <span class="text-primary">Terminal</span></h2>
+<p class="text-body-md text-on-surface-variant max-w-xl">Harnessing neural trend detection to optimize your engagement cycle. Currently monitoring 14.2M data points across 12 platforms.</p>
+</div>
+<div class="grid grid-cols-3 gap-lg mt-xl relative z-10">
+<div class="space-y-1">
+<p class="text-label-caps text-on-surface-variant/60">AVG. ENGAGEMENT</p>
+<p class="font-data-mono text-headline-sm text-primary">+24.8%</p>
+</div>
+<div class="space-y-1">
+<p class="text-label-caps text-on-surface-variant/60">PREDICTED REACH</p>
+<p class="font-data-mono text-headline-sm text-secondary">1.2M</p>
+</div>
+<div class="space-y-1">
+<p class="text-label-caps text-on-surface-variant/60">STRATEGY SCORE</p>
+<p class="font-data-mono text-headline-sm text-tertiary">94/100</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Market Saturation Chart -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<div class="p-lg rounded-xl bg-surface-container border border-white/5">
+<div class="flex justify-between items-center mb-md">
+<p class="font-label-caps text-on-surface-variant">Market Saturation</p>
+<span class="text-primary text-[10px] font-label-caps bg-primary/10 px-xs py-0.5 rounded">HIGH DEMAND</span>
+</div>
+<div class="h-32 flex items-end gap-1 px-1">
+<!-- Simple Mock CSS Chart -->
+<div class="flex-1 bg-white/10 h-[40%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[55%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[45%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[70%] rounded-t-sm"></div>
+<div class="flex-1 bg-primary/60 h-[90%] rounded-t-sm shadow-[0_0_10px_rgba(255,0,0,0.3)]"></div>
+<div class="flex-1 bg-white/10 h-[60%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[50%] rounded-t-sm"></div>
+<div class="flex-1 bg-white/10 h-[75%] rounded-t-sm"></div>
+</div>
+<p class="text-body-sm text-on-surface-variant/60 mt-md">Current niche competition is peaking at 14:00 GMT.</p>
+</div>
+<div class="p-lg rounded-xl bg-surface-container border border-white/5">
+<div class="flex justify-between items-center mb-md">
+<p class="font-label-caps text-on-surface-variant">Predicted Engagement</p>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative w-16 h-16">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2a2a2a" stroke-width="3"></path>
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ff0000" stroke-dasharray="82, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center font-data-mono text-body-sm">82%</span>
+</div>
+<div class="flex-1">
+<p class="text-body-sm font-semibold">Optimal Window</p>
+<p class="text-[10px] text-on-surface-variant/60">Next 4 hours: Peak performance</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trend Prediction Section (Red Glassmorphism Bento) -->
+<section class="space-y-md">
+<div class="flex justify-between items-end">
+<div>
+<h3 class="font-headline-sm text-headline-sm">Trend Prediction</h3>
+<p class="text-body-sm text-on-surface-variant/60">Live feed from global neural networks</p>
+</div>
+<button class="text-primary text-body-sm hover:underline">View All Trends</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Trend Card 1 -->
+<div class="glass-red p-lg rounded-xl flex flex-col justify-between h-48 group">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary">trending_up</span>
+<span class="font-data-mono text-xs text-primary">+342%</span>
+</div>
+<h4 class="font-headline-sm text-body-md font-bold mb-1">Hyper-Personalized AI</h4>
+<p class="text-body-sm text-on-surface-variant/70">The shift from generic GPT content to brand-cloned neural voices.</p>
+</div>
+<div class="flex gap-2">
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-primary/20 text-primary uppercase font-label-caps">TECH</span>
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-white/10 text-on-surface-variant/60 uppercase font-label-caps">B2B</span>
+</div>
+</div>
+<!-- Trend Card 2 -->
+<div class="glass-red p-lg rounded-xl flex flex-col justify-between h-48">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<span class="font-data-mono text-xs text-primary">+128%</span>
+</div>
+<h4 class="font-headline-sm text-body-md font-bold mb-1">Micro-Documentary</h4>
+<p class="text-body-sm text-on-surface-variant/70">High-production value storytelling compressed into 60 seconds.</p>
+</div>
+<div class="flex gap-2">
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-primary/20 text-primary uppercase font-label-caps">CONTENT</span>
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-white/10 text-on-surface-variant/60 uppercase font-label-caps">CREATIVE</span>
+</div>
+</div>
+<!-- Trend Card 3 -->
+<div class="glass-red p-lg rounded-xl flex flex-col justify-between h-48">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary">hub</span>
+<span class="font-data-mono text-xs text-primary">+89%</span>
+</div>
+<h4 class="font-headline-sm text-body-md font-bold mb-1">Spatial Audio Ops</h4>
+<p class="text-body-sm text-on-surface-variant/70">Using binaural soundscapes to increase viewer retention rates.</p>
+</div>
+<div class="flex gap-2">
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-primary/20 text-primary uppercase font-label-caps">AUDIO</span>
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-white/10 text-on-surface-variant/60 uppercase font-label-caps">TECH</span>
+</div>
+</div>
+<!-- Trend Card 4 -->
+<div class="glass-red p-lg rounded-xl flex flex-col justify-between h-48">
+<div>
+<div class="flex justify-between items-start mb-sm">
+<span class="material-symbols-outlined text-primary">data_thresholding</span>
+<span class="font-data-mono text-xs text-primary">+215%</span>
+</div>
+<h4 class="font-headline-sm text-body-md font-bold mb-1">Zero-Click Value</h4>
+<p class="text-body-sm text-on-surface-variant/70">Optimizing for in-feed consumption without external links.</p>
+</div>
+<div class="flex gap-2">
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-primary/20 text-primary uppercase font-label-caps">STRATEGY</span>
+<span class="text-[9px] px-2 py-0.5 rounded-full border border-white/10 text-on-surface-variant/60 uppercase font-label-caps">SEO</span>
+</div>
+</div>
+</div>
+</section>
+<!-- AI Script Generator Area -->
+<section class="grid grid-cols-12 gap-gutter">
+<div class="col-span-12 lg:col-span-9 bg-surface-container rounded-xl border border-white/5 overflow-hidden flex flex-col min-h-[500px]">
+<div class="p-md border-b border-white/5 flex justify-between items-center bg-surface-container-high/50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">edit_note</span>
+<h3 class="font-headline-sm text-body-md font-bold">AI Script Editor</h3>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-1.5 rounded bg-white/5 text-on-surface-variant text-body-sm hover:bg-white/10 transition-colors">Clear</button>
+<button class="px-md py-1.5 rounded bg-primary text-white text-body-sm font-semibold shadow-[0_0_15px_rgba(255,0,0,0.2)]">Generate Draft</button>
+</div>
+</div>
+<div class="flex-1 p-xl">
+<textarea class="w-full h-full bg-transparent border-none focus:ring-0 text-body-md font-data-mono leading-relaxed placeholder:text-on-surface-variant/20 resize-none custom-scrollbar" placeholder="Enter your prompt or start typing your script here..."></textarea>
+</div>
+<div class="p-sm bg-surface-container-lowest/50 border-t border-white/5 flex gap-md px-lg">
+<span class="text-[10px] font-label-caps text-on-surface-variant/40 uppercase">Tokens: 1,242 / 4,000</span>
+<span class="text-[10px] font-label-caps text-on-surface-variant/40 uppercase">Model: CE-PRO-v2</span>
+</div>
+</div>
+<!-- Tone Adjustments Sidebar -->
+<div class="col-span-12 lg:col-span-3 space-y-gutter">
+<div class="p-lg rounded-xl bg-surface-container border border-white/5">
+<h4 class="font-label-caps text-on-surface-variant mb-lg">Tone Adjustments</h4>
+<div class="space-y-lg">
+<div class="space-y-sm">
+<div class="flex justify-between text-[11px] font-label-caps">
+<span class="text-on-surface-variant/60">ANALYTICAL</span>
+<span class="text-primary">85%</span>
+</div>
+<div class="h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[85%]"></div>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-[11px] font-label-caps">
+<span class="text-on-surface-variant/60">ENERGETIC</span>
+<span class="text-on-surface-variant">42%</span>
+</div>
+<div class="h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-white/40 w-[42%]"></div>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex justify-between text-[11px] font-label-caps">
+<span class="text-on-surface-variant/60">AUTHORITATIVE</span>
+<span class="text-on-surface-variant">68%</span>
+</div>
+<div class="h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-white/40 w-[68%]"></div>
+</div>
+</div>
+</div>
+<div class="mt-xl space-y-md">
+<p class="text-label-caps text-on-surface-variant/60">Format Presets</p>
+<div class="grid grid-cols-1 gap-sm">
+<label class="flex items-center gap-sm p-sm rounded bg-white/5 cursor-pointer hover:bg-white/10 transition-colors">
+<input checked="" class="text-primary focus:ring-primary bg-transparent border-white/20" name="format" type="radio"/>
+<span class="text-body-sm">Short-Form Video</span>
+</label>
+<label class="flex items-center gap-sm p-sm rounded bg-transparent border border-white/5 cursor-pointer hover:bg-white/5 transition-colors">
+<input class="text-primary focus:ring-primary bg-transparent border-white/20" name="format" type="radio"/>
+<span class="text-body-sm">Long-Form Essay</span>
+</label>
+<label class="flex items-center gap-sm p-sm rounded bg-transparent border border-white/5 cursor-pointer hover:bg-white/5 transition-colors">
+<input class="text-primary focus:ring-primary bg-transparent border-white/20" name="format" type="radio"/>
+<span class="text-body-sm">Newsletter Thread</span>
+</label>
+</div>
+</div>
+</div>
+<div class="p-lg rounded-xl bg-surface-container border border-white/5 flex flex-col gap-sm">
+<button class="w-full py-3 rounded bg-primary text-white font-bold flex items-center justify-center gap-2 group overflow-hidden relative">
+<div class="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500"></div>
+<span class="material-symbols-outlined">rocket_launch</span>
+<span>Optimize &amp; Deploy</span>
+</button>
+<p class="text-[10px] text-center text-on-surface-variant/40">Syncs directly to your content calendar</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Placeholder for future interactive logic
+        document.querySelectorAll('.glass-red').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
+</body></html>

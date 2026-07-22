@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Support Hub | Creator Engine</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #050505;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card {
+            background: #1A1A1A;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease-in-out;
+        }
+        .glass-card:hover {
+            border-color: rgba(255, 0, 0, 0.3);
+            background: rgba(26, 26, 26, 0.8);
+        }
+        .sidebar-active-indicator {
+            position: absolute;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #ffb4a8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ffb4a8; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary": "#ffb95f",
+                        "on-primary-fixed-variant": "#930100",
+                        "on-tertiary-container": "#3e2400",
+                        "surface-variant": "#353534",
+                        "on-background": "#e5e2e1",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary": "#4edea3",
+                        "background": "#131313",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-secondary-container": "#00311f",
+                        "on-secondary-fixed-variant": "#005236",
+                        "outline": "#b18780",
+                        "inverse-primary": "#c00100",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-tint": "#ffb4a8",
+                        "on-primary": "#690100",
+                        "surface-container-highest": "#353534",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "on-error": "#690005",
+                        "surface": "#131313",
+                        "secondary-fixed": "#6ffbbe",
+                        "surface-container": "#201f1f",
+                        "on-surface-variant": "#ebbbb4",
+                        "primary": "#ffb4a8",
+                        "secondary-container": "#00a572",
+                        "surface-bright": "#3a3939",
+                        "secondary-fixed-dim": "#4edea3",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "primary-fixed": "#ffdad4",
+                        "on-primary-fixed": "#410000",
+                        "on-primary-container": "#5c0000",
+                        "tertiary-container": "#ca8100",
+                        "error-container": "#93000a",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-secondary-fixed": "#002113",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary-container": "#ff5540",
+                        "on-secondary": "#003824",
+                        "surface-dim": "#131313",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#472a00",
+                        "outline-variant": "#603e39",
+                        "surface-container-low": "#1c1b1b",
+                        "on-surface": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "8px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "sidebar-width": "260px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "container-max": "1440px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col w-sidebar-width border-r border-white/10 bg-background z-50">
+<div class="px-lg py-xl flex flex-col gap-xs">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Creator Engine</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-60">v2.4.0 Stable</p>
+</div>
+<nav class="flex-1 px-sm">
+<div class="space-y-base">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">video_library</span>
+<span class="font-body-md text-body-md">Videos</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">auto_mode</span>
+<span class="font-body-md text-body-md">Automation</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">history</span>
+<span class="font-body-md text-body-md">History</span>
+</a>
+<a class="text-primary border-l-2 border-primary font-bold flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</nav>
+<div class="p-lg border-t border-white/5 space-y-md">
+<button class="w-full py-sm px-md bg-primary-container text-on-primary-container font-bold text-body-md rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Automation
+            </button>
+<div class="flex items-center gap-md pt-sm">
+<img class="w-10 h-10 rounded-full border border-white/10 object-cover" data-alt="A professional headshot of a creative professional in their late 20s with a focused expression, wearing sleek modern tech-wear. The lighting is dramatic and moody with deep shadows and soft primary red highlights that match the dark mode UI aesthetic. High-quality studio photography, cinematic bokeh background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGFG-7uJMv_m8-VVYGxlUaaezK31eN5yT0L0GdJIhFRcr0of1g68-6WgVwtOGW0ccm2LrstWOqCJ1ija83gZNtNNYoFZ-ZzNaVWnFXUKh7XliGu9VuCCxqC2qz4kZ2RkEo32owHqE3eXsQHDY6CoFwQRldKsHXwVLcnLue4FKR3K4zys7SE8BLvuS0xpzvxz3UOVvuike8GjSng0Q0pyMCnY6MpNP3oCNHm65Buwq7Zl0aev6fskbhRg"/>
+<div class="overflow-hidden">
+<p class="font-body-md text-body-md font-semibold truncate text-on-surface">Alex Rivera</p>
+<p class="font-label-caps text-label-caps text-secondary uppercase">Pro Plan</p>
+</div>
+<button class="ml-auto text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width h-screen overflow-y-auto bg-surface flex flex-col relative">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-white/5 flex justify-between items-center h-16 px-lg w-full">
+<div class="flex items-center flex-1 max-w-2xl relative">
+<span class="material-symbols-outlined absolute left-md text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border border-white/5 rounded-lg py-2 pl-12 pr-md text-body-md focus:outline-none focus:border-primary/50 transition-colors" placeholder="Search documentation, components, and guides..." type="text"/>
+</div>
+<div class="flex items-center gap-lg ml-lg">
+<button class="text-on-surface-variant hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">apps</span>
+</button>
+</div>
+</header>
+<!-- Content Shell -->
+<div class="flex-1 p-lg max-w-container-max mx-auto w-full grid grid-cols-12 gap-lg relative">
+<!-- Hero Section (Full Width across Grid) -->
+<section class="col-span-12 py-xl text-center flex flex-col items-center">
+<h2 class="font-display-lg text-display-lg text-on-surface mb-md">How can we help?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mb-xl">
+                    Everything you need to master the Creator Engine. Search our documentation or browse our categorized guides below.
+                </p>
+<div class="w-full max-w-3xl relative">
+<input class="w-full bg-surface-container-high border border-white/10 rounded-full py-4 px-14 text-headline-sm focus:outline-none focus:border-primary transition-all shadow-2xl" placeholder="Search for 'How to automate video rendering'..." type="text"/>
+<span class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-primary text-3xl">search</span>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-on-primary font-bold px-6 py-2 rounded-full hover:opacity-90 transition-opacity">
+                        Search
+                    </button>
+</div>
+</section>
+<!-- Categorized Cards Grid -->
+<section class="col-span-12 md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Getting Started -->
+<div class="glass-card p-lg rounded-xl group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-md">
+<div class="p-md rounded-lg bg-surface-container-highest border border-white/5">
+<span class="material-symbols-outlined text-primary text-3xl">rocket_launch</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Getting Started</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Learn the core concepts and set up your first automation pipeline in under 5 minutes.</p>
+<div class="flex items-center text-primary font-bold text-body-md">
+                        Explore Guides <span class="material-symbols-outlined ml-sm text-[18px]">arrow_forward</span>
+</div>
+</div>
+<!-- API Documentation -->
+<div class="glass-card p-lg rounded-xl group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-secondary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-md">
+<div class="p-md rounded-lg bg-surface-container-highest border border-white/5">
+<span class="material-symbols-outlined text-secondary text-3xl">terminal</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">API Documentation</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Integrate Creator Engine into your existing workflow with our robust REST and GraphQL APIs.</p>
+<div class="flex items-center text-secondary font-bold text-body-md">
+                        View API Reference <span class="material-symbols-outlined ml-sm text-[18px]">arrow_forward</span>
+</div>
+</div>
+<!-- Troubleshooting -->
+<div class="glass-card p-lg rounded-xl group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-tertiary/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-md">
+<div class="p-md rounded-lg bg-surface-container-highest border border-white/5">
+<span class="material-symbols-outlined text-tertiary text-3xl">build</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Troubleshooting</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Encountered an error? Find solutions to common issues and performance optimization tips.</p>
+<div class="flex items-center text-tertiary font-bold text-body-md">
+                        Find Solutions <span class="material-symbols-outlined ml-sm text-[18px]">arrow_forward</span>
+</div>
+</div>
+<!-- Community Discord -->
+<div class="glass-card p-lg rounded-xl group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-on-surface-variant/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-on-surface-variant/10 transition-colors"></div>
+<div class="flex items-start justify-between mb-md">
+<div class="p-md rounded-lg bg-surface-container-highest border border-white/5">
+<span class="material-symbols-outlined text-on-surface-variant text-3xl">forum</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Community Discord</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">Join 10k+ creators to share workflows, ask questions, and get real-time peer support.</p>
+<div class="flex items-center text-on-surface-variant font-bold text-body-md">
+                        Join Server <span class="material-symbols-outlined ml-sm text-[18px]">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Side Sidebar: Recently Updated -->
+<aside class="col-span-12 md:col-span-4 flex flex-col gap-lg">
+<div class="glass-panel p-lg rounded-xl">
+<h4 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center justify-between">
+                        Recent Updates
+                        <span class="material-symbols-outlined text-on-surface-variant text-lg">update</span>
+</h4>
+<div class="space-y-md">
+<!-- Article 1 -->
+<div class="flex gap-md group cursor-pointer">
+<div class="flex-1">
+<h5 class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Integrating with YouTube API v3</h5>
+<div class="flex items-center gap-sm mt-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Documentation</span>
+<span class="w-1 h-1 bg-white/20 rounded-full"></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">2h ago</span>
+</div>
+</div>
+</div>
+<hr class="border-white/5"/>
+<!-- Article 2 -->
+<div class="flex gap-md group cursor-pointer">
+<div class="flex-1">
+<h5 class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Configuring Webhook Listeners</h5>
+<div class="flex items-center gap-sm mt-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">API Guide</span>
+<span class="w-1 h-1 bg-white/20 rounded-full"></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">5h ago</span>
+</div>
+</div>
+</div>
+<hr class="border-white/5"/>
+<!-- Article 3 -->
+<div class="flex gap-md group cursor-pointer">
+<div class="flex-1">
+<h5 class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">Optimizing FFmpeg Rendering</h5>
+<div class="flex items-center gap-sm mt-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Troubleshooting</span>
+<span class="w-1 h-1 bg-white/20 rounded-full"></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Yesterday</span>
+</div>
+</div>
+</div>
+<hr class="border-white/5"/>
+<!-- Article 4 -->
+<div class="flex gap-md group cursor-pointer">
+<div class="flex-1">
+<h5 class="font-body-md text-body-md font-semibold text-on-surface group-hover:text-primary transition-colors">V2.4 Migration Checklist</h5>
+<div class="flex items-center gap-sm mt-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Announcement</span>
+<span class="w-1 h-1 bg-white/20 rounded-full"></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Oct 12</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-lg py-sm font-label-caps text-label-caps uppercase tracking-widest text-on-surface-variant hover:text-primary border border-white/5 hover:border-primary/30 rounded transition-all">
+                        View All Articles
+                    </button>
+</div>
+<!-- Call to Action Card -->
+<div class="relative overflow-hidden p-lg rounded-xl bg-primary-container text-on-primary-container shadow-xl">
+<div class="relative z-10">
+<h4 class="font-headline-sm text-headline-sm mb-sm">Need Direct Help?</h4>
+<p class="font-body-md text-body-md opacity-90 mb-lg">Our technical support engineers are available 24/7 for Pro and Agency users.</p>
+<button class="bg-on-primary-container text-primary-container font-bold px-lg py-sm rounded-lg hover:bg-white transition-colors">
+                            Contact Support
+                        </button>
+</div>
+<!-- Background Visual Decor -->
+<div class="absolute -right-10 -bottom-10 opacity-20 transform rotate-12">
+<span class="material-symbols-outlined text-[120px]" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+</div>
+</div>
+</aside>
+<!-- Featured Video Tutorials (Asymmetric Layout) -->
+<section class="col-span-12 mt-xl">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface">Video Tutorials</h3>
+<a class="text-primary font-body-md flex items-center hover:underline" href="#">Browse Channel <span class="material-symbols-outlined ml-xs text-[16px]">open_in_new</span></a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="space-y-md group cursor-pointer">
+<div class="aspect-video rounded-xl bg-surface-container overflow-hidden relative border border-white/5 group-hover:border-primary/50 transition-colors">
+<div class="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105" data-alt="A futuristic professional video editing workspace with multiple curved monitors glowing with high-density data visualizations and waveform charts. The environment is dark with subtle red neon accents, representing a high-performance content creation studio. Cinematic style with deep depth of field." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCuFL3j9-lwMMCKZMrvfTZ5hB9ND-Y4xXQo3noTsd9jWqSgd6yffFjJBdgjykR156smJW7TvXZ4QY4PS-mUGpVbsleemrwMv1A7c-__6ppqsWT8y14THYFARbhRvSAIzYnsZmi0cue3t53ji7bOYtgq54U1cuHwxB6I_qmFp-D47xN3ZGlHoS5MrZ0d_DVVhptTlwHiFUTjN72WjPajhk-4nzRr2v-3ok4w1CsS9WkB0THXyiEZRhjjuA')"></div>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-5xl" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+<span class="absolute bottom-md right-md bg-black/80 text-white font-data-mono text-xs px-2 py-1 rounded">12:45</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight group-hover:text-primary transition-colors">Mastering the Advanced Logic Nodes</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Complete walkthrough of the new logical branching nodes in V2.4.</p>
+</div>
+<div class="space-y-md group cursor-pointer">
+<div class="aspect-video rounded-xl bg-surface-container overflow-hidden relative border border-white/5 group-hover:border-primary/50 transition-colors">
+<div class="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105" data-alt="A clean, minimalist 3D rendering of server racks and floating digital data streams. The aesthetic is clinical and powerful, featuring a dark charcoal background with emerald green and primary red data points. Representing stable API infrastructure and cloud connectivity." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBUEi0PLg0NWHkf9V8hDEkl8ntVmEgnK6Q1PZTEQPCaNtuByr-4DFSKS1zkFvA1ya-my-3arMVpQsc1aX3z_bjTZWxEHXxlmJQKTYEb0T_qFpNV0udjwToOFe7qmVZ1Ul17MdeeI-fxSkyvL1iHcCbuJ4nM2GMd3AXeqEpG5eUCikjPOAeBVEpY0B0fXmYXybRxz1pFocVvV478TKRugZHW8CKKrjyKNekg6F4imnShSansXdZz1q_hlw')"></div>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-5xl" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+<span class="absolute bottom-md right-md bg-black/80 text-white font-data-mono text-xs px-2 py-1 rounded">08:20</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight group-hover:text-primary transition-colors">Automated Batch Rendering Guide</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">How to queue and process over 1,000 video variations simultaneously.</p>
+</div>
+<div class="space-y-md group cursor-pointer">
+<div class="aspect-video rounded-xl bg-surface-container overflow-hidden relative border border-white/5 group-hover:border-primary/50 transition-colors">
+<div class="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105" data-alt="A conceptual digital illustration of interconnected geometric nodes forming a complex web. The nodes glow with soft white light against a deep black void, with primary red connections highlighting the critical path. The mood is sophisticated and technical, representing complex workflow automation." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAswpjY-bJTYrY7MFXG-9hEx5SOG9BhBEKoi42Y_3wqA0hpOZ3-LOEDORsumlc0UR_1yB2gicIQ8DbxcFi-kA2dbNnIXdq-hCLZWpV1nO9fLRkjYMXSZpsFNnCqSkOO5XFbAw8eiEvVUEYGWdEMkOcXBr79IsYle3XQ4va3euXNj_Nm5xb5GCPxpWthXqRoL7H202aDlW3ZVCpsyGRno6EcRK8MvuHtQPzgDeZ9VIURnJxwUZSHUGKFrg')"></div>
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-5xl" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+</div>
+<span class="absolute bottom-md right-md bg-black/80 text-white font-data-mono text-xs px-2 py-1 rounded">15:10</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface leading-tight group-hover:text-primary transition-colors">Setting up Multi-Channel Webhooks</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Learn to sync your data across Slack, Discord, and internal CRM systems.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer Overlay Decor -->
+<footer class="mt-auto border-t border-white/5 p-lg flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-lg">
+<span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 Creator Engine. Professional Edition.</span>
+<nav class="flex gap-md">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface underline" href="#">Terms</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface underline" href="#">Privacy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface underline" href="#">Security</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<span class="flex items-center gap-sm font-label-caps text-label-caps text-secondary">
+<span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+                    ALL SYSTEMS OPERATIONAL
+                </span>
+</div>
+</footer>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Smooth hover effects for interactive elements
+        const cards = document.querySelectorAll('.glass-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Subtle radial highlight
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Search bar activation keyboard shortcut
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.querySelector('header input').focus();
+            }
+        });
+    </script>
+</body></html>

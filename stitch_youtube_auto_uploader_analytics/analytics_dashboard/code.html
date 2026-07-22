@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Creator Engine | Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        .chart-gradient {
+            background: linear-gradient(180deg, rgba(255, 85, 64, 0.1) 0%, rgba(255, 85, 64, 0) 100%);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #353534;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#3a3939",
+                        "secondary-fixed-dim": "#4edea3",
+                        "surface-container": "#201f1f",
+                        "secondary-container": "#00a572",
+                        "outline-variant": "#603e39",
+                        "on-primary-container": "#5c0000",
+                        "on-primary-fixed-variant": "#930100",
+                        "on-secondary": "#003824",
+                        "primary-container": "#ff5540",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "primary": "#ffb4a8",
+                        "on-tertiary-container": "#3e2400",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "on-primary-fixed": "#410000",
+                        "primary-fixed-dim": "#ffb4a8",
+                        "on-secondary-container": "#00311f",
+                        "primary-fixed": "#ffdad4",
+                        "on-tertiary": "#472a00",
+                        "outline": "#b18780",
+                        "tertiary-container": "#ca8100",
+                        "tertiary-fixed": "#ffddb8",
+                        "background": "#050505",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-variant": "#353534",
+                        "on-primary": "#690100",
+                        "surface-dim": "#131313",
+                        "surface-container-low": "#1c1b1b",
+                        "on-secondary-fixed-variant": "#005236",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-primary": "#c00100",
+                        "surface": "#131313",
+                        "tertiary": "#ffb95f",
+                        "on-secondary-fixed": "#002113",
+                        "on-surface": "#e5e2e1",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-error": "#690005",
+                        "secondary": "#4edea3",
+                        "error-container": "#93000a",
+                        "on-background": "#e5e2e1",
+                        "on-surface-variant": "#ebbbb4",
+                        "surface-container-highest": "#353534",
+                        "surface-tint": "#ffb4a8",
+                        "inverse-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "surface-container-lowest": "#0e0e0e",
+                        "secondary-fixed": "#6ffbbe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "container-max": "1440px",
+                        "xl": "40px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "sidebar-width": "260px",
+                        "md": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-md-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "label-caps": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-caps": ["10px", {"lineHeight": "12px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full flex flex-col w-sidebar-width border-r border-white/10 bg-background z-50">
+<div class="p-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Creator Engine</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-data-mono">v2.4.0 Stable</p>
+</div>
+<nav class="flex-1 px-md mt-sm space-y-1">
+<a class="text-primary border-l-2 border-primary font-bold flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="video_library">video_library</span>
+                Videos
+            </a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="auto_mode">auto_mode</span>
+                Automation
+            </a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="history">history</span>
+                History
+            </a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="p-md space-y-4">
+<button class="w-full py-sm bg-primary-container text-on-primary-container font-bold rounded-lg hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary-container/20">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+                New Automation
+            </button>
+<div class="pt-md border-t border-white/5">
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="help">help</span>
+                    Support
+                </a>
+<a class="text-on-surface-variant flex items-center px-lg py-sm hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined mr-md" data-icon="logout">logout</span>
+                    Sign Out
+                </a>
+</div>
+</div>
+</aside>
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center h-16 px-lg ml-sidebar-width w-[calc(100%-theme(spacing.sidebar-width))] bg-surface/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40" data-icon="search">search</span>
+<input class="w-full bg-surface-container border-white/5 text-on-surface rounded-full pl-10 py-1.5 focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Search analytics or videos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80">
+<span class="material-symbols-outlined" data-icon="apps">apps</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-white/10 ring-2 ring-primary/20">
+<img class="w-full h-full object-cover" data-alt="A professional high-end headshot of a modern creator in a dark minimalist studio environment. The lighting is dramatic and cinematic, with a soft red glow highlighting one side of the face. The aesthetic is clean, technical, and powerful, perfectly aligning with the dark Obsidian Flux design theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvt7DHqus_7CZulicSZ7uULVqnrCfNivtNwwIPxoR5hOnnrSPhTWOomq7YbgM2okw12zEQlXKFkt5ED2ubLiG3qKAnATFIebCmuojG0asAtUY7Uxibb9THnXGDnLpIqg__DTLjhjaKrASBK48LQx6FzKtBoLxS5gQ8PrBfXULixD3OMbv9cgS4q5DZBWj1YMLiAuWscD5pJmXW9Ui43CdOoos6DO07trwqxwFwdf12bim1IR5o8ylaRA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width p-lg max-w-container-max mx-auto">
+<!-- Header Section -->
+<div class="mb-xl">
+<h2 class="font-headline-md text-headline-md font-bold mb-xs">Creator Insights</h2>
+<p class="text-on-surface-variant">Welcome back. Your automation pipelines are currently running at 98.4% efficiency.</p>
+</div>
+<!-- High-Level Stats Overview -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-lg">
+<div class="glass-panel p-lg rounded-xl transition-all hover:translate-y-[-2px]">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-on-surface-variant font-label-caps uppercase text-label-caps">Total Uploads</span>
+<span class="material-symbols-outlined text-primary" data-icon="upload">upload</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-headline-md font-data-mono font-bold">1,248</span>
+<span class="text-secondary text-body-sm font-data-mono pb-1">+12%</span>
+</div>
+</div>
+<div class="glass-panel p-lg rounded-xl transition-all hover:translate-y-[-2px]">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-on-surface-variant font-label-caps uppercase text-label-caps">Avg. Views</span>
+<span class="material-symbols-outlined text-primary" data-icon="visibility">visibility</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-headline-md font-data-mono font-bold">42.5K</span>
+<span class="text-secondary text-body-sm font-data-mono pb-1">+5.2%</span>
+</div>
+</div>
+<div class="glass-panel p-lg rounded-xl transition-all hover:translate-y-[-2px]">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-on-surface-variant font-label-caps uppercase text-label-caps">Watch Time (h)</span>
+<span class="material-symbols-outlined text-primary" data-icon="timer">timer</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-headline-md font-data-mono font-bold">18.2K</span>
+<span class="text-error text-body-sm font-data-mono pb-1">-2.1%</span>
+</div>
+</div>
+<div class="glass-panel p-lg rounded-xl transition-all hover:translate-y-[-2px]">
+<div class="flex items-center justify-between mb-sm">
+<span class="text-on-surface-variant font-label-caps uppercase text-label-caps">Success Rate</span>
+<span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex items-end gap-2">
+<span class="text-headline-md font-data-mono font-bold">99.2%</span>
+<span class="text-secondary text-body-sm font-data-mono pb-1">Stable</span>
+</div>
+</div>
+</div>
+<!-- Main Chart Section -->
+<div class="glass-panel rounded-xl p-lg mb-lg relative overflow-hidden">
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold">Upload Performance</h3>
+<p class="text-body-sm text-on-surface-variant">Views vs. Upload frequency over the last 30 days</p>
+</div>
+<div class="flex gap-2">
+<button class="px-md py-1 bg-surface-container rounded border border-white/5 text-body-sm text-on-surface hover:border-primary/50">Daily</button>
+<button class="px-md py-1 bg-primary text-on-primary font-bold rounded text-body-sm">Weekly</button>
+<button class="px-md py-1 bg-surface-container rounded border border-white/5 text-body-sm text-on-surface hover:border-primary/50">Monthly</button>
+</div>
+</div>
+<!-- Simplified Vector Chart -->
+<div class="h-64 w-full relative">
+<svg class="w-full h-full overflow-visible" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="chartFill" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ff5540" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#ff5540" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 Q100,140 200,80 T400,100 T600,40 T800,90 T1000,20 L1000,200 L0,200 Z" fill="url(#chartFill)"></path>
+<path d="M0,150 Q100,140 200,80 T400,100 T600,40 T800,90 T1000,20" fill="none" stroke="#ff5540" stroke-linecap="round" stroke-width="3"></path>
+<!-- Comparison Line -->
+<path d="M0,160 Q150,150 300,130 T600,140 T900,120 T1000,130" fill="none" stroke="#353534" stroke-dasharray="8,4" stroke-width="2"></path>
+</svg>
+<!-- Grid Labels -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-30 text-[10px] font-data-mono py-1">
+<span>100K</span>
+<span>75K</span>
+<span>50K</span>
+<span>25K</span>
+<span>0</span>
+</div>
+</div>
+<div class="mt-lg flex justify-between text-body-sm font-data-mono text-on-surface-variant/50 px-4">
+<span>OCT 01</span>
+<span>OCT 07</span>
+<span>OCT 14</span>
+<span>OCT 21</span>
+<span>OCT 28</span>
+</div>
+</div>
+<!-- Bottom Grid: Activity & Health -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Recent Activity Feed -->
+<div class="lg:col-span-2 glass-panel rounded-xl overflow-hidden flex flex-col">
+<div class="p-lg border-b border-white/5 flex justify-between items-center">
+<h3 class="font-headline-sm text-headline-sm font-bold">Recent Activity</h3>
+<button class="text-primary text-body-sm hover:underline">View All</button>
+</div>
+<div class="flex-1 overflow-y-auto max-h-[400px]">
+<!-- Activity Items -->
+<div class="px-lg py-md flex items-center gap-md hover:bg-white/[0.03] transition-colors border-b border-white/5">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary" data-icon="cloud_done">cloud_done</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Video Uploaded: "10 AI Tools for 2024"</h4>
+<p class="text-body-sm text-on-surface-variant">Scheduled release: Oct 29, 08:00 AM</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-xs bg-secondary/10 text-secondary text-[10px] font-bold rounded uppercase">Completed</span>
+<p class="text-[10px] font-data-mono text-on-surface-variant mt-1">2 mins ago</p>
+</div>
+</div>
+<div class="px-lg py-md flex items-center gap-md hover:bg-white/[0.03] transition-colors border-b border-white/5">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-tertiary" data-icon="sync">sync</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Metadata Optimization: "Healthy Eating Tips"</h4>
+<p class="text-body-sm text-on-surface-variant">Updating SEO tags and descriptions...</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-xs bg-tertiary/10 text-tertiary text-[10px] font-bold rounded uppercase">Processing</span>
+<p class="text-[10px] font-data-mono text-on-surface-variant mt-1">15 mins ago</p>
+</div>
+</div>
+<div class="px-lg py-md flex items-center gap-md hover:bg-white/[0.03] transition-colors border-b border-white/5">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error" data-icon="warning">warning</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Upload Failed: "Product Review Vol. 2"</h4>
+<p class="text-body-sm text-on-surface-variant">API Error 403: Quota exceeded</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-xs bg-error/10 text-error text-[10px] font-bold rounded uppercase">Failed</span>
+<p class="text-[10px] font-data-mono text-on-surface-variant mt-1">1 hour ago</p>
+</div>
+</div>
+<div class="px-lg py-md flex items-center gap-md hover:bg-white/[0.03] transition-colors border-b border-white/5">
+<div class="w-12 h-12 rounded bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary" data-icon="cloud_done">cloud_done</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Channel Synced: @MainCreatorChannel</h4>
+<p class="text-body-sm text-on-surface-variant">Synchronized 24 new comments</p>
+</div>
+<div class="text-right">
+<span class="px-sm py-xs bg-secondary/10 text-secondary text-[10px] font-bold rounded uppercase">Synced</span>
+<p class="text-[10px] font-data-mono text-on-surface-variant mt-1">3 hours ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Channel Health Widget -->
+<div class="glass-panel rounded-xl p-lg flex flex-col justify-between">
+<div>
+<h3 class="font-headline-sm text-headline-sm font-bold mb-lg">System Health</h3>
+<div class="space-y-lg">
+<!-- Storage Usage -->
+<div>
+<div class="flex justify-between text-body-sm mb-2">
+<span class="text-on-surface-variant">Storage Capacity</span>
+<span class="font-data-mono">820 GB / 1 TB</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 82%"></div>
+</div>
+</div>
+<!-- API Quota -->
+<div>
+<div class="flex justify-between text-body-sm mb-2">
+<span class="text-on-surface-variant">YouTube API Quota</span>
+<span class="font-data-mono">4,200 / 10k</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary" style="width: 42%"></div>
+</div>
+</div>
+<!-- Rendering Node Status -->
+<div class="p-md bg-white/[0.03] rounded-lg border border-white/5">
+<div class="flex items-center gap-sm mb-sm">
+<div class="h-2 w-2 bg-secondary rounded-full animate-pulse"></div>
+<span class="text-body-sm font-bold">Rendering Engine: Active</span>
+</div>
+<p class="text-[10px] text-on-surface-variant font-data-mono uppercase">Node ID: US-WEST-01 // LATENCY: 24ms</p>
+</div>
+</div>
+</div>
+<div class="mt-lg pt-lg border-t border-white/5">
+<button class="w-full py-2 bg-surface-container border border-white/5 text-on-surface text-body-sm font-bold rounded hover:bg-surface-container-high transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+                        Advanced Logs
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        // Simple hover interaction for stat cards
+        document.querySelectorAll('.glass-panel').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = 'rgba(255, 180, 168, 0.3)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>

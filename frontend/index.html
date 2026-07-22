@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Shorts Factory | AI YouTube Automation</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "yt-red": "#FF0000",
+            "yt-red-dim": "#cc0000",
+            "surface": "#0a0a0a",
+            "surface-card": "#141414",
+            "surface-elevated": "#1e1e1e",
+            "surface-border": "#2a2a2a",
+            "surface-hover": "#252525",
+            "text-primary": "#e8e8e8",
+            "text-secondary": "#9a9a9a",
+            "text-muted": "#5a5a5a",
+            "accent-green": "#00C853",
+            "accent-blue": "#4A90E2",
+            "accent-yellow": "#FFD600",
+            "accent-purple": "#9C27B0",
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"],
+          },
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #0a0a0a; color: #e8e8e8; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; }
+
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+
+    /* Sidebar */
+    #sidebar { width: 260px; min-height: 100vh; background: #0e0e0e; border-right: 1px solid #1e1e1e; flex-shrink: 0; display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+    #main-content { margin-left: 260px; min-height: 100vh; }
+
+    /* Glass card */
+    .glass { background: rgba(20,20,20,0.8); border: 1px solid rgba(255,255,255,0.07); backdrop-filter: blur(12px); border-radius: 12px; }
+    .glass:hover { border-color: rgba(255,255,255,0.12); }
+
+    /* Stats card */
+    .stat-card { background: #141414; border: 1px solid #1e1e1e; border-radius: 12px; padding: 20px; transition: border-color 0.2s, transform 0.2s; }
+    .stat-card:hover { border-color: #FF0000; transform: translateY(-2px); }
+
+    /* Nav item */
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; color: #9a9a9a; font-size: 14px; font-weight: 500; margin: 2px 8px; }
+    .nav-item:hover { background: #1a1a1a; color: #e8e8e8; }
+    .nav-item.active { background: linear-gradient(135deg, rgba(255,0,0,0.15), rgba(255,0,0,0.05)); color: #FF0000; border: 1px solid rgba(255,0,0,0.2); }
+    .nav-item .material-symbols-outlined { font-size: 20px; }
+
+    /* Page */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Button styles */
+    .btn-primary { background: #FF0000; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary:hover { background: #cc0000; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(255,0,0,0.3); }
+    .btn-secondary { background: #1e1e1e; color: #e8e8e8; padding: 10px 20px; border-radius: 8px; border: 1px solid #2a2a2a; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-secondary:hover { background: #252525; border-color: #404040; }
+    .btn-danger { background: rgba(255,0,0,0.1); color: #FF0000; padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,0,0,0.3); cursor: pointer; font-weight: 500; font-size: 14px; transition: all 0.2s; }
+    .btn-danger:hover { background: rgba(255,0,0,0.2); }
+
+    /* Badge */
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-red { background: rgba(255,0,0,0.15); color: #FF0000; }
+    .badge-green { background: rgba(0,200,83,0.15); color: #00C853; }
+    .badge-blue { background: rgba(74,144,226,0.15); color: #4A90E2; }
+    .badge-yellow { background: rgba(255,214,0,0.15); color: #FFD600; }
+
+    /* Input */
+    .input-field { background: #141414; border: 1px solid #2a2a2a; color: #e8e8e8; padding: 10px 14px; border-radius: 8px; font-size: 14px; width: 100%; outline: none; transition: border-color 0.2s; }
+    .input-field:focus { border-color: #FF0000; }
+    .input-field::placeholder { color: #5a5a5a; }
+
+    /* Select */
+    select.input-field option { background: #1e1e1e; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #404040; }
+
+    /* Video grid */
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .video-card { background: #141414; border: 1px solid #1e1e1e; border-radius: 10px; overflow: hidden; transition: all 0.2s; cursor: pointer; }
+    .video-card:hover { border-color: #FF0000; transform: translateY(-3px); box-shadow: 0 8px 30px rgba(255,0,0,0.15); }
+    .video-thumb { width: 100%; aspect-ratio: 9/16; object-fit: cover; background: #1a1a1a; }
+    .video-thumb-placeholder { width: 100%; aspect-ratio: 9/16; background: linear-gradient(135deg, #1a1a1a, #0e0e0e); display: flex; align-items: center; justify-content: center; }
+
+    /* Chart container */
+    .chart-container { position: relative; height: 200px; }
+
+    /* Status dot */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .status-dot.green { background: #00C853; box-shadow: 0 0 8px #00C853; }
+    .status-dot.red { background: #FF0000; box-shadow: 0 0 8px #FF0000; }
+    .status-dot.yellow { background: #FFD600; box-shadow: 0 0 8px #FFD600; }
+
+    /* Toast notification */
+    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+    .toast { background: #1e1e1e; border: 1px solid #2a2a2a; color: #e8e8e8; padding: 12px 20px; border-radius: 10px; font-size: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px; max-width: 360px; }
+    .toast.success { border-color: rgba(0,200,83,0.3); }
+    .toast.error { border-color: rgba(255,0,0,0.3); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* Animated running indicator */
+    .pulse-ring { animation: pulseRing 1.5s infinite; }
+    @keyframes pulseRing { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* Progress bar */
+    .progress-bar { height: 4px; background: #1e1e1e; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #FF0000, #cc0000); border-radius: 4px; transition: width 0.5s ease; }
+
+    /* Sidebar logo glow */
+    .logo-glow { text-shadow: 0 0 20px rgba(255,0,0,0.5); }
+
+    /* Topic pill */
+    .topic-pill { background: #1e1e1e; border: 1px solid #2a2a2a; color: #9a9a9a; padding: 6px 14px; border-radius: 20px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .topic-pill:hover { border-color: #FF0000; color: #FF0000; }
+    .topic-pill button { background: none; border: none; cursor: pointer; color: inherit; font-size: 16px; line-height: 1; padding: 0; }
+
+    /* Log terminal */
+    .log-terminal { background: #060606; border: 1px solid #1a1a1a; border-radius: 10px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #7a9a7a; height: 300px; overflow-y: auto; }
+    .log-terminal .log-error { color: #ff6b6b; }
+    .log-terminal .log-warn { color: #FFD600; }
+    .log-terminal .log-info { color: #7a9a7a; }
+
+    /* Tooltip */
+    .tooltip-wrapper { position: relative; }
+    .tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #1e1e1e; border: 1px solid #2a2a2a; color: #e8e8e8; padding: 6px 10px; border-radius: 6px; font-size: 12px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.2s; margin-bottom: 6px; }
+    .tooltip-wrapper:hover .tooltip { opacity: 1; }
+  </style>
+</head>
+
+<body>
+  <!-- ─── SIDEBAR ─────────────────────────────────────────────────────── -->
+  <aside id="sidebar">
+    <!-- Logo -->
+    <div class="px-6 py-5 border-b border-surface-border">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-yt-red flex items-center justify-center shadow-lg">
+          <span class="material-symbols-outlined text-white" style="font-size:20px">play_circle</span>
+        </div>
+        <div>
+          <div class="font-bold text-base text-white logo-glow">Shorts Factory</div>
+          <div class="text-xs text-text-muted font-mono">AI Automation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pipeline Status -->
+    <div class="mx-3 my-3 p-3 rounded-lg bg-surface-card border border-surface-border">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-semibold text-text-secondary uppercase tracking-wider">Pipeline</span>
+        <span id="pipeline-badge" class="badge badge-green text-xs">Idle</span>
+      </div>
+      <button id="run-now-btn" onclick="runPipeline()" class="btn-primary w-full text-center justify-center" style="padding:8px 16px;font-size:13px;">
+        <span class="material-symbols-outlined" style="font-size:16px">rocket_launch</span>
+        Run Now
+      </button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-2">
+      <div class="px-4 py-2 text-xs font-semibold text-text-muted uppercase tracking-wider">Main</div>
+
+      <div class="nav-item active" onclick="showPage('analytics')" id="nav-analytics">
+        <span class="material-symbols-outlined">analytics</span>
+        Analytics
+      </div>
+      <div class="nav-item" onclick="showPage('videos')" id="nav-videos">
+        <span class="material-symbols-outlined">video_library</span>
+        Video Library
+      </div>
+      <div class="nav-item" onclick="showPage('logs')" id="nav-logs">
+        <span class="material-symbols-outlined">history</span>
+        Upload History
+      </div>
+
+      <div class="px-4 py-2 mt-2 text-xs font-semibold text-text-muted uppercase tracking-wider">Create</div>
+
+      <div class="nav-item" onclick="showPage('content')" id="nav-content">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        AI Strategist
+      </div>
+      <div class="nav-item" onclick="showPage('wizard')" id="nav-wizard">
+        <span class="material-symbols-outlined">add_circle</span>
+        New Short
+      </div>
+
+      <div class="px-4 py-2 mt-2 text-xs font-semibold text-text-muted uppercase tracking-wider">Manage</div>
+
+      <div class="nav-item" onclick="showPage('channel')" id="nav-channel">
+        <span class="material-symbols-outlined">manage_accounts</span>
+        Channel
+      </div>
+      <div class="nav-item" onclick="showPage('settings')" id="nav-settings">
+        <span class="material-symbols-outlined">settings</span>
+        Settings
+      </div>
+    </nav>
+
+    <!-- Server Status Footer -->
+    <div class="border-t border-surface-border px-4 py-3">
+      <div class="flex items-center gap-2 text-xs text-text-muted">
+        <span id="server-dot" class="status-dot yellow"></span>
+        <span id="server-status-text">Connecting...</span>
+      </div>
+      <div class="text-xs text-text-muted mt-1 font-mono">localhost:8899</div>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN CONTENT ───────────────────────────────────────────────── -->
+  <main id="main-content" class="p-6">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: Analytics Dashboard -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-analytics">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Analytics Dashboard</h1>
+          <p class="text-text-secondary text-sm mt-1">Real-time YouTube channel performance</p>
+        </div>
+        <div class="flex gap-3">
+          <select id="analytics-days" class="input-field" style="width:140px;" onchange="loadAnalytics()">
+            <option value="7">Last 7 days</option>
+            <option value="28" selected>Last 28 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+          <button onclick="loadAnalytics(true)" class="btn-secondary">
+            <span class="material-symbols-outlined" style="font-size:16px">refresh</span>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-text-secondary text-sm">Total Views</span>
+            <div class="w-8 h-8 rounded-lg bg-red-950 flex items-center justify-center">
+              <span class="material-symbols-outlined text-yt-red" style="font-size:18px">visibility</span>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-white" id="kpi-views">—</div>
+          <div class="text-xs text-text-muted mt-1" id="kpi-views-sub">Loading...</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-text-secondary text-sm">Subscribers</span>
+            <div class="w-8 h-8 rounded-lg" style="background:rgba(0,200,83,0.1);">
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-green" style="font-size:18px">person_add</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-white" id="kpi-subs">—</div>
+          <div class="text-xs text-text-muted mt-1" id="kpi-subs-sub">Loading...</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-text-secondary text-sm">Watch Time</span>
+            <div class="w-8 h-8 rounded-lg" style="background:rgba(74,144,226,0.1);">
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-blue" style="font-size:18px">schedule</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-white" id="kpi-watch">—</div>
+          <div class="text-xs text-text-muted mt-1">minutes this period</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-text-secondary text-sm">Videos Uploaded</span>
+            <div class="w-8 h-8 rounded-lg" style="background:rgba(255,214,0,0.1);">
+              <div class="w-full h-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-accent-yellow" style="font-size:18px">upload</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-3xl font-bold text-white" id="kpi-videos">—</div>
+          <div class="text-xs text-text-muted mt-1" id="kpi-videos-sub">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-6">
+        <!-- Views Chart -->
+        <div class="glass p-5 xl:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-white">Daily Views</h2>
+            <span class="badge badge-red text-xs">LIVE</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="views-chart"></canvas>
+          </div>
+        </div>
+
+        <!-- Channel Stats -->
+        <div class="glass p-5">
+          <h2 class="font-semibold text-white mb-4">Channel Overview</h2>
+          <div class="flex flex-col items-center mb-4">
+            <div id="ch-avatar" class="w-16 h-16 rounded-full bg-surface-elevated flex items-center justify-center mb-3 border-2 border-yt-red">
+              <span class="material-symbols-outlined text-text-secondary" style="font-size:32px">person</span>
+            </div>
+            <div class="font-semibold text-white" id="ch-title">Not Connected</div>
+            <div class="text-xs text-text-muted" id="ch-id"></div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-text-secondary text-sm">Total Subscribers</span>
+              <span class="font-mono font-semibold text-white" id="ch-subs">—</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-text-secondary text-sm">Total Views</span>
+              <span class="font-mono font-semibold text-white" id="ch-views">—</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-text-secondary text-sm">Total Videos</span>
+              <span class="font-mono font-semibold text-white" id="ch-count">—</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-text-secondary text-sm">Likes (period)</span>
+              <span class="font-mono font-semibold text-white" id="ch-likes">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Videos -->
+      <div class="glass p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-semibold text-white">Top Performing Shorts</h2>
+          <button onclick="showPage('videos')" class="text-yt-red text-sm hover:underline">View all →</button>
+        </div>
+        <div id="top-videos-list">
+          <div class="text-center py-8 text-text-muted">
+            <span class="material-symbols-outlined text-4xl mb-2" style="display:block">video_library</span>
+            Loading analytics...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: Video Library -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-videos">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Video Library</h1>
+          <p class="text-text-secondary text-sm mt-1">All uploaded Shorts</p>
+        </div>
+        <div class="flex gap-3">
+          <input type="text" id="video-search" class="input-field" placeholder="Search videos..." style="width:220px;" oninput="filterVideos()"/>
+          <button onclick="loadVideos()" class="btn-secondary">
+            <span class="material-symbols-outlined" style="font-size:16px">refresh</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="flex gap-3 mb-6">
+        <button class="badge badge-red video-filter active-filter" onclick="filterVideos('all')">All</button>
+        <button class="badge badge-green video-filter" onclick="filterVideos('recent')">Recent</button>
+        <button class="badge badge-blue video-filter" onclick="filterVideos('popular')">Most Views</button>
+      </div>
+
+      <div id="video-grid" class="video-grid">
+        <div class="text-text-muted text-center col-span-full py-12">
+          <span class="material-symbols-outlined text-6xl mb-3" style="display:block;opacity:0.3">video_library</span>
+          <p>Loading videos...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: Upload History / Logs -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-logs">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-white">Upload History & Logs</h1>
+          <p class="text-text-secondary text-sm mt-1">Pipeline run history and system logs</p>
+        </div>
+        <button onclick="loadProgress()" class="btn-secondary">
+          <span class="material-symbols-outlined" style="font-size:16px">refresh</span>
+          Refresh
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <!-- Progress Ledger -->
+        <div class="glass p-5">
+          <h2 class="font-semibold text-white mb-4">Production Runs</h2>
+          <div id="progress-list" class="space-y-3 max-h-96 overflow-y-auto">
+            <div class="text-text-muted text-center py-8">Loading...</div>
+          </div>
+        </div>
+
+        <!-- System Logs -->
+        <div class="glass p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-white">System Logs</h2>
+            <button onclick="loadLogs()" class="btn-secondary" style="padding:6px 12px;font-size:12px;">Refresh</button>
+          </div>
+          <div id="log-terminal" class="log-terminal"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: AI Content Strategist -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-content">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-white">AI Content Strategist</h1>
+        <p class="text-text-secondary text-sm mt-1">Generate and manage your content pipeline</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <!-- Topic Generator -->
+        <div class="glass p-5">
+          <h2 class="font-semibold text-white mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-yt-red">auto_awesome</span>
+            Topic Generator
+          </h2>
+
+          <div class="space-y-3 mb-4">
+            <div>
+              <label class="text-sm text-text-secondary mb-1 block">Channel Niche</label>
+              <input type="text" id="gen-niche" class="input-field" placeholder="e.g. personal finance" value="personal finance"/>
+            </div>
+          </div>
+
+          <button onclick="generateTopics()" id="gen-btn" class="btn-primary w-full justify-center mb-4">
+            <span class="material-symbols-outlined" style="font-size:16px">sparkle</span>
+            Generate 5 Topic Ideas
+          </button>
+
+          <div id="topic-ideas" class="space-y-3">
+            <div class="text-text-muted text-sm text-center py-6">Click Generate to get AI-powered topic ideas</div>
+          </div>
+        </div>
+
+        <!-- Topic Backlog -->
+        <div class="glass p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="font-semibold text-white flex items-center gap-2">
+              <span class="material-symbols-outlined text-accent-blue">queue</span>
+              Topic Backlog
+            </h2>
+            <span id="topic-count" class="badge badge-blue text-xs">0 topics</span>
+          </div>
+
+          <div class="flex gap-2 mb-4">
+            <input type="text" id="new-topic-input" class="input-field" placeholder="Add a topic..." onkeydown="if(event.key==='Enter') addTopic()"/>
+            <button onclick="addTopic()" class="btn-primary" style="padding:10px 16px;white-space:nowrap;">Add</button>
+          </div>
+
+          <div id="topic-pills" class="flex flex-wrap gap-2 max-h-80 overflow-y-auto">
+            <div class="text-text-muted text-sm">Loading topics...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Script Preview -->
+      <div class="glass p-5 mt-6">
+        <h2 class="font-semibold text-white mb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-accent-green">article</span>
+          Script Preview
+          <span class="text-text-muted text-sm font-normal">(AI-generated)</span>
+        </h2>
+        <div id="script-preview" class="text-text-muted italic text-sm text-center py-8">
+          Generate topics above and click "Use This Topic" to preview a script
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: New Short Wizard -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-wizard">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-white">Create New Short</h1>
+        <p class="text-text-secondary text-sm mt-1">Run the full pipeline manually</p>
+      </div>
+
+      <div class="max-w-2xl">
+        <div class="glass p-6 mb-4">
+          <h2 class="font-semibold text-white mb-5">Pipeline Configuration</h2>
+
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm text-text-secondary mb-1 block">Topic (optional — auto-picks if empty)</label>
+              <input type="text" id="wizard-topic" class="input-field" placeholder="e.g. The hidden bank fees costing you $329/year"/>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-text-secondary mb-1 block">Privacy</label>
+                <select id="wizard-privacy" class="input-field">
+                  <option value="private">Private (test)</option>
+                  <option value="unlisted">Unlisted</option>
+                  <option value="public">Public</option>
+                </select>
+              </div>
+              <div class="flex flex-col justify-end">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="wizard-skip-gate" class="w-4 h-4 accent-red-500"/>
+                  <span class="text-sm text-text-secondary">Skip virality gate</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-lg bg-surface-card border border-surface-border">
+              <div class="text-xs text-text-secondary font-semibold mb-2 uppercase tracking-wider">Pipeline Steps</div>
+              <div class="space-y-1 text-sm text-text-muted">
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-yt-red" style="font-size:14px">check_circle</span> 1. Pick topic & check virality</div>
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-yt-red" style="font-size:14px">check_circle</span> 2. Generate script with Gemini AI</div>
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-yt-red" style="font-size:14px">check_circle</span> 3. Generate voice with gTTS</div>
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-yt-red" style="font-size:14px">check_circle</span> 4. Render 1080×1920 video (CPU)</div>
+                <div class="flex items-center gap-2"><span class="material-symbols-outlined text-yt-red" style="font-size:14px">check_circle</span> 5. Upload to YouTube</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run Button -->
+        <div id="wizard-idle">
+          <button onclick="runPipelineCustom()" class="btn-primary w-full justify-center" style="padding:14px;font-size:16px;">
+            <span class="material-symbols-outlined">rocket_launch</span>
+            Start Pipeline
+          </button>
+          <p class="text-text-muted text-xs text-center mt-2">Takes 2-5 minutes on first run</p>
+        </div>
+
+        <!-- Running State -->
+        <div id="wizard-running" style="display:none;">
+          <div class="glass p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-3 h-3 rounded-full bg-yt-red pulse-ring"></div>
+              <span class="font-semibold text-white">Pipeline Running...</span>
+            </div>
+            <div id="wizard-step" class="text-text-secondary text-sm mb-3">Starting up...</div>
+            <div class="progress-bar"><div id="wizard-progress" class="progress-fill" style="width:10%"></div></div>
+            <div class="text-xs text-text-muted mt-2" id="wizard-elapsed">0s elapsed</div>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div id="wizard-result" style="display:none;" class="glass p-6">
+          <div id="wizard-result-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: Channel Manager -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-channel">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-white">Channel Manager</h1>
+        <p class="text-text-secondary text-sm mt-1">YouTube account connection & channel settings</p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <!-- Connection Status -->
+        <div class="glass p-6">
+          <h2 class="font-semibold text-white mb-5">YouTube Connection</h2>
+
+          <div id="yt-connection-status" class="flex items-center gap-4 mb-6 p-4 rounded-lg bg-surface-card border border-surface-border">
+            <div class="w-12 h-12 rounded-full bg-surface-elevated flex items-center justify-center">
+              <span class="material-symbols-outlined text-text-muted" style="font-size:28px">link_off</span>
+            </div>
+            <div>
+              <div class="font-semibold text-white" id="yt-connection-label">Not Connected</div>
+              <div class="text-sm text-text-muted" id="yt-connection-detail">Set up OAuth2 credentials first</div>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="text-sm text-text-secondary mb-1 block">YouTube Client ID</label>
+              <input type="text" id="yt-client-id" class="input-field font-mono text-xs" placeholder="xxx.apps.googleusercontent.com"/>
+            </div>
+            <div>
+              <label class="text-sm text-text-secondary mb-1 block">YouTube Client Secret</label>
+              <input type="password" id="yt-client-secret" class="input-field font-mono text-xs" placeholder="••••••••"/>
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-4">
+            <button onclick="saveYTCredentials()" class="btn-secondary flex-1 justify-center">
+              <span class="material-symbols-outlined" style="font-size:16px">save</span>
+              Save Credentials
+            </button>
+            <button onclick="authYouTube()" class="btn-primary flex-1 justify-center">
+              <span class="material-symbols-outlined" style="font-size:16px">login</span>
+              Authorize
+            </button>
+          </div>
+
+          <div class="mt-4 p-3 rounded-lg bg-surface-card border border-surface-border text-xs text-text-muted">
+            <strong class="text-white">How to get credentials:</strong><br>
+            1. Go to <a href="https://console.cloud.google.com" target="_blank" class="text-yt-red hover:underline">Google Cloud Console</a><br>
+            2. Create project → Enable YouTube Data API v3 + YouTube Analytics API<br>
+            3. Create OAuth2 credentials (Desktop app)<br>
+            4. Paste Client ID & Secret above → click Authorize
+          </div>
+        </div>
+
+        <!-- Channel Info -->
+        <div class="glass p-6">
+          <h2 class="font-semibold text-white mb-5">Channel Details</h2>
+          <div id="channel-details" class="text-center py-8 text-text-muted">
+            <span class="material-symbols-outlined text-5xl mb-3" style="display:block;opacity:0.3">account_circle</span>
+            Connect YouTube to see channel details
+          </div>
+        </div>
+      </div>
+
+      <!-- Gemini API -->
+      <div class="glass p-6 mt-6">
+        <h2 class="font-semibold text-white mb-5">Gemini AI Configuration</h2>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div>
+            <label class="text-sm text-text-secondary mb-1 block">Gemini API Key</label>
+            <div class="flex gap-2">
+              <input type="password" id="gemini-key-input" class="input-field font-mono text-xs" placeholder="AIza..."/>
+              <button onclick="saveGeminiKey()" class="btn-primary" style="padding:10px 16px;white-space:nowrap;">Save</button>
+            </div>
+            <p class="text-xs text-text-muted mt-1">
+              Get a free key at <a href="https://aistudio.google.com" target="_blank" class="text-yt-red hover:underline">aistudio.google.com</a>
+            </p>
+          </div>
+          <div class="p-4 rounded-lg bg-surface-card border border-surface-border">
+            <div class="text-sm font-semibold text-white mb-2">Free Tier Limits</div>
+            <div class="space-y-1 text-xs text-text-muted">
+              <div>• Gemini 1.5 Flash: 15 requests/min</div>
+              <div>• 1,000,000 tokens/day</div>
+              <div>• Enough for ~100 Shorts/day</div>
+              <div class="text-accent-green mt-2">✓ Completely free, no credit card needed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- PAGE: Settings -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div class="mb-6">
+        <h1 class="text-2xl font-bold text-white">Automation Settings</h1>
+        <p class="text-text-secondary text-sm mt-1">Configure your Shorts Factory pipeline</p>
+      </div>
+
+      <div class="max-w-2xl space-y-6">
+        <!-- Content Settings -->
+        <div class="glass p-6">
+          <h2 class="font-semibold text-white mb-5">Content Configuration</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="text-sm text-text-secondary mb-1 block">Channel Niche</label>
+              <input type="text" id="s-niche" class="input-field" placeholder="e.g. personal finance, cooking, tech tips"/>
+            </div>
+            <div>
+              <label class="text-sm text-text-secondary mb-1 block">Target Audience</label>
+              <input type="text" id="s-audience" class="input-field" placeholder="e.g. young adults 18-35"/>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="text-sm text-text-secondary mb-1 block">Upload Privacy</label>
+                <select id="s-privacy" class="input-field">
+                  <option value="public">Public</option>
+                  <option value="unlisted">Unlisted</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-sm text-text-secondary mb-1 block">Daily Upload Count</label>
+                <select id="s-count" class="input-field">
+                  <option value="1">1 per day</option>
+                  <option value="2">2 per day</option>
+                  <option value="3" selected>3 per day</option>
+                  <option value="5">5 per day</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button onclick="saveSettings()" class="btn-primary mt-4">
+            <span class="material-symbols-outlined" style="font-size:16px">save</span>
+            Save Settings
+          </button>
+        </div>
+
+        <!-- Windows Task Scheduler -->
+        <div class="glass p-6">
+          <h2 class="font-semibold text-white mb-2">Windows Task Scheduler</h2>
+          <p class="text-text-secondary text-sm mb-4">Set up automatic 3×/day uploads</p>
+
+          <div class="space-y-2 mb-4">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-card">
+              <span class="text-sm text-white">Morning Run</span>
+              <span class="badge badge-green">12:00 PM</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-card">
+              <span class="text-sm text-white">Afternoon Run</span>
+              <span class="badge badge-green">5:00 PM</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-surface-card">
+              <span class="text-sm text-white">Evening Run</span>
+              <span class="badge badge-green">9:00 PM</span>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-surface-card border border-surface-border text-xs text-text-muted font-mono mb-3">
+            schtasks /create /tn "ShortsFactory" /tr "C:\...\run_daily.bat" /sc daily /st 12:00
+          </div>
+          <button onclick="copySchedulerCommand()" class="btn-secondary">
+            <span class="material-symbols-outlined" style="font-size:16px">content_copy</span>
+            Copy Scheduler Command
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- ─── JAVASCRIPT ────────────────────────────────────────────────────── -->
+  <script>
+    const API = 'http://localhost:8899/api';
+    let viewsChart = null;
+    let allVideos = [];
+    let pollTimer = null;
+    let wizardStartTime = null;
+    let wizardElapsedTimer = null;
+
+    // ─── Init ──────────────────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', () => {
+      checkServerStatus();
+      loadAnalytics();
+      loadTopics();
+      loadSettings();
+      setInterval(checkServerStatus, 10000);
+      setInterval(checkPipelineStatus, 3000);
+    });
+
+    // ─── Navigation ────────────────────────────────────────────────────────
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      document.getElementById('nav-' + id)?.classList.add('active');
+
+      // Lazy load page data
+      if (id === 'videos') loadVideos();
+      if (id === 'logs') { loadProgress(); loadLogs(); }
+      if (id === 'content') loadTopics();
+    }
+
+    // ─── Server Status ─────────────────────────────────────────────────────
+    async function checkServerStatus() {
+      try {
+        const data = await apiGet('/status');
+        document.getElementById('server-dot').className = 'status-dot green';
+        document.getElementById('server-status-text').textContent = 'Server Online';
+      } catch {
+        document.getElementById('server-dot').className = 'status-dot red';
+        document.getElementById('server-status-text').textContent = 'Server Offline';
+        document.getElementById('pipeline-badge').textContent = 'Offline';
+        document.getElementById('pipeline-badge').className = 'badge badge-red text-xs';
+      }
+    }
+
+    // ─── API Helpers ───────────────────────────────────────────────────────
+    async function apiGet(path) {
+      const r = await fetch(API + path);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    }
+
+    async function apiPost(path, body = {}) {
+      const r = await fetch(API + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    }
+
+    // ─── Toast ─────────────────────────────────────────────────────────────
+    function toast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
+      const color = type === 'success' ? '#00C853' : type === 'error' ? '#FF0000' : '#4A90E2';
+      el.innerHTML = `<span class="material-symbols-outlined" style="color:${color};font-size:18px">${icon}</span>${msg}`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // ─── Format helpers ────────────────────────────────────────────────────
+    function fmt(n) {
+      n = Number(n) || 0;
+      if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+      if (n >= 1000) return (n/1000).toFixed(1) + 'K';
+      return n.toLocaleString();
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    }
+
+    // ─── Analytics ─────────────────────────────────────────────────────────
+    async function loadAnalytics(force = false) {
+      const days = document.getElementById('analytics-days').value;
+      try {
+        const data = await apiGet(`/analytics?days=${days}${force ? '&force=true' : ''}`);
+        renderAnalytics(data);
+      } catch (e) {
+        // Show demo data if server offline
+        renderAnalytics(getDemoAnalytics());
+      }
+    }
+
+    function getDemoAnalytics() {
+      const days = [];
+      for (let i = 27; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        days.push({ date: d.toISOString().slice(0,10), views: Math.floor(Math.random()*500 + 50) });
+      }
+      return {
+        channel: { title: 'Demo Channel', total_subscribers: 1234, total_views: 45678, video_count: 23, thumbnail: '' },
+        totals: { views: 8923, watch_minutes: 1456, subs_gained: 89, likes: 234 },
+        daily_views: days,
+        top_videos: [],
+        note: 'Demo data — start server to see real analytics',
+      };
+    }
+
+    function renderAnalytics(data) {
+      const ch = data.channel || {};
+      const totals = data.totals || {};
+
+      // KPI cards
+      document.getElementById('kpi-views').textContent = fmt(totals.views || 0);
+      document.getElementById('kpi-views-sub').textContent = `${fmt(totals.likes || 0)} likes`;
+      document.getElementById('kpi-subs').textContent = fmt(ch.total_subscribers || 0);
+      document.getElementById('kpi-subs-sub').textContent = `+${fmt(totals.subs_gained || 0)} this period`;
+      document.getElementById('kpi-watch').textContent = fmt(totals.watch_minutes || 0);
+      document.getElementById('kpi-videos').textContent = fmt(ch.video_count || 0);
+      document.getElementById('kpi-videos-sub').textContent = 'total on channel';
+
+      // Channel overview
+      document.getElementById('ch-title').textContent = ch.title || 'Not Connected';
+      document.getElementById('ch-subs').textContent = fmt(ch.total_subscribers || 0);
+      document.getElementById('ch-views').textContent = fmt(ch.total_views || 0);
+      document.getElementById('ch-count').textContent = fmt(ch.video_count || 0);
+      document.getElementById('ch-likes').textContent = fmt(totals.likes || 0);
+      if (ch.thumbnail) {
+        document.getElementById('ch-avatar').innerHTML = `<img src="${ch.thumbnail}" class="w-full h-full rounded-full object-cover"/>`;
+      }
+
+      // Views chart
+      renderViewsChart(data.daily_views || []);
+
+      // Top videos
+      renderTopVideos(data.top_videos || []);
+    }
+
+    function renderViewsChart(dailyViews) {
+      const labels = dailyViews.map(d => {
+        const dt = new Date(d.date);
+        return dt.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      });
+      const values = dailyViews.map(d => d.views);
+
+      if (viewsChart) viewsChart.destroy();
+      const ctx = document.getElementById('views-chart').getContext('2d');
+      viewsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Views',
+            data: values,
+            borderColor: '#FF0000',
+            backgroundColor: 'rgba(255,0,0,0.08)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#FF0000',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#5a5a5a', maxTicksLimit: 8 } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#5a5a5a', callback: v => fmt(v) } },
+          }
+        }
+      });
+    }
+
+    function renderTopVideos(videos) {
+      const el = document.getElementById('top-videos-list');
+      if (!videos.length) {
+        el.innerHTML = '<div class="text-center py-6 text-text-muted text-sm">No videos yet — run your first pipeline!</div>';
+        return;
+      }
+      el.innerHTML = videos.slice(0,5).map(v => `
+        <div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-card transition-colors cursor-pointer" onclick="window.open('${v.url}','_blank')">
+          <div class="w-10 h-16 rounded flex-shrink-0 bg-surface-elevated overflow-hidden">
+            ${v.thumbnail ? `<img src="${v.thumbnail}" class="w-full h-full object-cover"/>` : '<div class="w-full h-full flex items-center justify-center"><span class="material-symbols-outlined text-text-muted" style="font-size:20px">play_circle</span></div>'}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-medium text-white truncate">${v.title}</div>
+            <div class="text-xs text-text-muted">${fmtDate(v.published_at)}</div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <div class="text-sm font-semibold text-white">${fmt(v.views)}</div>
+            <div class="text-xs text-text-muted">views</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ─── Videos ────────────────────────────────────────────────────────────
+    async function loadVideos() {
+      document.getElementById('video-grid').innerHTML = '<div class="text-text-muted text-center col-span-full py-12"><span class="material-symbols-outlined text-4xl mb-2" style="display:block;animation:pulse 1s infinite">hourglass_empty</span>Loading...</div>';
+      try {
+        allVideos = await apiGet('/videos');
+        renderVideos(allVideos);
+      } catch {
+        document.getElementById('video-grid').innerHTML = '<div class="text-text-muted text-center col-span-full py-12">Start server to load videos</div>';
+      }
+    }
+
+    function renderVideos(videos) {
+      const grid = document.getElementById('video-grid');
+      if (!videos.length) {
+        grid.innerHTML = '<div class="text-text-muted text-center col-span-full py-12"><span class="material-symbols-outlined text-5xl mb-3" style="display:block;opacity:0.3">video_off</span>No videos yet. Run your first pipeline!</div>';
+        return;
+      }
+      grid.innerHTML = videos.map(v => `
+        <div class="video-card" onclick="window.open('${v.url}','_blank')">
+          <div class="video-thumb-placeholder">
+            ${v.thumbnail ? `<img src="${v.thumbnail}" class="video-thumb"/>` : '<span class="material-symbols-outlined text-text-muted" style="font-size:40px">play_circle</span>'}
+          </div>
+          <div class="p-3">
+            <div class="text-xs font-medium text-white line-clamp-2 mb-1">${v.title}</div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-text-muted">${fmtDate(v.published_at)}</span>
+              <span class="text-xs font-mono text-yt-red">${fmt(v.views)} views</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterVideos(sort) {
+      let videos = [...allVideos];
+      const q = document.getElementById('video-search')?.value?.toLowerCase() || '';
+      if (q) videos = videos.filter(v => v.title.toLowerCase().includes(q));
+      if (sort === 'popular') videos.sort((a,b) => b.views - a.views);
+      if (sort === 'recent') videos.sort((a,b) => new Date(b.published_at) - new Date(a.published_at));
+      renderVideos(videos);
+    }
+
+    // ─── Progress / Logs ───────────────────────────────────────────────────
+    async function loadProgress() {
+      try {
+        const data = await apiGet('/progress');
+        const el = document.getElementById('progress-list');
+        if (!data.length) {
+          el.innerHTML = '<div class="text-text-muted text-center py-6 text-sm">No runs yet</div>';
+          return;
+        }
+        el.innerHTML = data.slice().reverse().slice(0,20).map(r => `
+          <div class="p-3 rounded-lg bg-surface-card border border-surface-border">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono text-xs text-text-muted">${r.run_id}</span>
+              <span class="badge ${r.success ? 'badge-green' : 'badge-red'} text-xs">${r.success ? '✓ OK' : '✗ FAILED'}</span>
+            </div>
+            <div class="text-sm text-white truncate">${r.title || r.topic || 'Unknown'}</div>
+            <div class="flex justify-between text-xs text-text-muted mt-1">
+              <span>${fmtDate(r.started_at)}</span>
+              <span>${r.elapsed_seconds ? Math.round(r.elapsed_seconds) + 's' : ''}</span>
+            </div>
+            ${r.url ? `<a href="${r.url}" target="_blank" class="text-xs text-yt-red hover:underline">${r.url}</a>` : ''}
+            ${r.error ? `<div class="text-xs text-red-400 mt-1 truncate">${r.error}</div>` : ''}
+          </div>
+        `).join('');
+      } catch { document.getElementById('progress-list').innerHTML = '<div class="text-text-muted text-center py-6 text-sm">Start server to load history</div>'; }
+    }
+
+    async function loadLogs() {
+      try {
+        const data = await apiGet('/logs?n=80');
+        const el = document.getElementById('log-terminal');
+        el.innerHTML = (data.logs || []).map(line => {
+          const cls = line.includes('ERROR') ? 'log-error' : line.includes('WARNING') ? 'log-warn' : 'log-info';
+          return `<div class="${cls}">${line}</div>`;
+        }).join('');
+        el.scrollTop = el.scrollHeight;
+      } catch { document.getElementById('log-terminal').innerHTML = '<div class="log-info">Start server to see logs</div>'; }
+    }
+
+    // ─── Topics ────────────────────────────────────────────────────────────
+    async function loadTopics() {
+      try {
+        const data = await apiGet('/topics');
+        const topics = data.topics || [];
+        document.getElementById('topic-count').textContent = topics.length + ' topics';
+        const pills = document.getElementById('topic-pills');
+        if (!topics.length) {
+          pills.innerHTML = '<div class="text-text-muted text-sm">No topics yet</div>';
+          return;
+        }
+        pills.innerHTML = topics.map(t => `
+          <div class="topic-pill">
+            <span class="truncate max-w-xs">${t}</span>
+            <button onclick="useTopic('${t.replace(/'/g,"\\'")}')">→</button>
+          </div>
+        `).join('');
+      } catch { document.getElementById('topic-pills').innerHTML = '<div class="text-text-muted text-sm">Start server to load topics</div>'; }
+    }
+
+    async function addTopic() {
+      const input = document.getElementById('new-topic-input');
+      const topic = input.value.trim();
+      if (!topic) return;
+      try {
+        await apiPost('/topics', { topic });
+        input.value = '';
+        toast('Topic added!', 'success');
+        loadTopics();
+      } catch { toast('Failed to add topic', 'error'); }
+    }
+
+    function useTopic(topic) {
+      document.getElementById('wizard-topic').value = topic;
+      document.getElementById('gen-niche').value = topic;
+      showPage('wizard');
+      toast(`Topic set: "${topic}"`, 'success');
+    }
+
+    async function generateTopics() {
+      const niche = document.getElementById('gen-niche').value.trim() || 'personal finance';
+      const btn = document.getElementById('gen-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;animation:spin 1s linear infinite">refresh</span> Generating...';
+
+      try {
+        const data = await apiPost('/generate-topic', { niche });
+        const ideas = data.ideas || [];
+        document.getElementById('topic-ideas').innerHTML = ideas.map(i => `
+          <div class="p-3 rounded-lg bg-surface-card border border-surface-border hover:border-yt-red transition-colors">
+            <div class="font-medium text-white text-sm mb-1">${i.topic}</div>
+            <div class="text-xs text-text-muted italic">"${i.hook}"</div>
+            <button onclick="useTopic('${i.topic.replace(/'/g,"\\'")}'); addTopicDirect('${i.topic.replace(/'/g,"\\'")}');" class="mt-2 text-xs text-yt-red hover:underline">Use this topic →</button>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('topic-ideas').innerHTML = `<div class="text-red-400 text-sm">Error: ${e.message}. Make sure server is running and Gemini key is set.</div>`;
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px">sparkle</span> Generate 5 Topic Ideas';
+    }
+
+    async function addTopicDirect(topic) {
+      try { await apiPost('/topics', { topic }); } catch {}
+    }
+
+    // ─── Settings ──────────────────────────────────────────────────────────
+    async function loadSettings() {
+      try {
+        const data = await apiGet('/settings');
+        document.getElementById('s-niche').value = data.channel_niche || '';
+        document.getElementById('s-audience').value = data.channel_target_audience || '';
+        document.getElementById('s-privacy').value = data.upload_privacy || 'public';
+        document.getElementById('s-count').value = data.daily_upload_count || 3;
+
+        // Update channel page
+        const authed = data.youtube_authed;
+        const configured = data.youtube_configured;
+        if (authed) {
+          document.getElementById('yt-connection-label').textContent = 'Connected';
+          document.getElementById('yt-connection-detail').textContent = 'YouTube OAuth2 token active';
+          document.getElementById('yt-connection-status').style.borderColor = 'rgba(0,200,83,0.3)';
+        } else if (configured) {
+          document.getElementById('yt-connection-label').textContent = 'Credentials Set';
+          document.getElementById('yt-connection-detail').textContent = 'Click Authorize to connect';
+        }
+      } catch {}
+    }
+
+    async function saveSettings() {
+      try {
+        await apiPost('/settings', {
+          channel_niche: document.getElementById('s-niche').value,
+          channel_target_audience: document.getElementById('s-audience').value,
+          upload_privacy: document.getElementById('s-privacy').value,
+          daily_upload_count: document.getElementById('s-count').value,
+        });
+        toast('Settings saved! Restart server to apply.', 'success');
+      } catch { toast('Failed to save settings', 'error'); }
+    }
+
+    async function saveGeminiKey() {
+      const key = document.getElementById('gemini-key-input').value.trim();
+      if (!key) { toast('Enter your Gemini API key', 'error'); return; }
+      toast('Key format saved. Update GEMINI_API_KEY in .env file.', 'success');
+    }
+
+    async function saveYTCredentials() {
+      toast('Update YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET in .env file.', 'success');
+    }
+
+    async function authYouTube() {
+      toast('Starting YouTube OAuth2 flow...', 'info');
+      try {
+        const data = await apiPost('/auth/youtube');
+        if (data.success) {
+          toast('YouTube connected successfully!', 'success');
+          loadSettings();
+        } else {
+          toast('Auth failed: ' + data.message, 'error');
+        }
+      } catch { toast('Run authenticate_youtube.bat manually to connect YouTube', 'error'); }
+    }
+
+    // ─── Pipeline / Run ────────────────────────────────────────────────────
+    async function runPipeline() {
+      if (document.getElementById('pipeline-badge').textContent === 'Running') {
+        toast('Pipeline already running!', 'error');
+        return;
+      }
+      try {
+        await apiPost('/run', { dry_run: false });
+        document.getElementById('pipeline-badge').textContent = 'Running';
+        document.getElementById('pipeline-badge').className = 'badge badge-red text-xs';
+        toast('Pipeline started!', 'success');
+      } catch { toast('Start server first: run start_dashboard.bat', 'error'); }
+    }
+
+    function runPipelineCustom() {
+      const topic = document.getElementById('wizard-topic').value.trim() || null;
+      const skipGate = document.getElementById('wizard-skip-gate').checked;
+      const privacy = document.getElementById('wizard-privacy').value;
+
+      document.getElementById('wizard-idle').style.display = 'none';
+      document.getElementById('wizard-running').style.display = 'block';
+      document.getElementById('wizard-result').style.display = 'none';
+
+      wizardStartTime = Date.now();
+      wizardElapsedTimer = setInterval(() => {
+        const s = Math.round((Date.now() - wizardStartTime) / 1000);
+        document.getElementById('wizard-elapsed').textContent = `${s}s elapsed`;
+        document.getElementById('wizard-progress').style.width = Math.min(90, s * 1.5) + '%';
+        const steps = ['Picking topic...', 'Running virality gate...', 'Generating script with Gemini...', 'Generating voice audio...', 'Rendering video frames...', 'Uploading to YouTube...'];
+        document.getElementById('wizard-step').textContent = steps[Math.min(Math.floor(s/15), steps.length-1)];
+      }, 1000);
+
+      apiPost('/run', { topic, skip_gate: skipGate, dry_run: false })
+        .then(() => pollWizardStatus())
+        .catch(e => {
+          clearInterval(wizardElapsedTimer);
+          document.getElementById('wizard-running').style.display = 'none';
+          document.getElementById('wizard-idle').style.display = 'block';
+          toast('Error: ' + e.message, 'error');
+        });
+    }
+
+    async function pollWizardStatus() {
+      const check = async () => {
+        try {
+          const data = await apiGet('/run/status');
+          if (!data.running && data.last_result) {
+            clearInterval(wizardElapsedTimer);
+            document.getElementById('wizard-running').style.display = 'none';
+            document.getElementById('wizard-result').style.display = 'block';
+            showWizardResult(data.last_result);
+            document.getElementById('pipeline-badge').textContent = 'Idle';
+            document.getElementById('pipeline-badge').className = 'badge badge-green text-xs';
+            return;
+          }
+        } catch {}
+        setTimeout(check, 3000);
+      };
+      setTimeout(check, 5000);
+    }
+
+    function showWizardResult(r) {
+      const el = document.getElementById('wizard-result-content');
+      if (r.success) {
+        el.innerHTML = `
+          <div class="flex items-center gap-3 mb-4">
+            <span class="material-symbols-outlined text-accent-green" style="font-size:32px">check_circle</span>
+            <div><div class="font-bold text-white text-lg">Upload Successful!</div><div class="text-text-secondary text-sm">${Math.round(r.elapsed_seconds||0)}s total</div></div>
+          </div>
+          <div class="space-y-2 mb-4">
+            <div class="text-sm"><span class="text-text-muted">Title:</span> <span class="text-white">${r.title}</span></div>
+            <div class="text-sm"><span class="text-text-muted">Topic:</span> <span class="text-white">${r.topic}</span></div>
+            ${r.url ? `<a href="${r.url}" target="_blank" class="inline-flex items-center gap-2 text-yt-red hover:underline mt-2"><span class="material-symbols-outlined" style="font-size:16px">open_in_new</span>View on YouTube</a>` : ''}
+          </div>
+          <button onclick="resetWizard()" class="btn-primary">Make Another Short</button>
+        `;
+      } else {
+        el.innerHTML = `
+          <div class="flex items-center gap-3 mb-4">
+            <span class="material-symbols-outlined text-yt-red" style="font-size:32px">error</span>
+            <div><div class="font-bold text-white text-lg">Pipeline Failed</div></div>
+          </div>
+          <div class="text-red-400 text-sm mb-4 font-mono bg-surface-card p-3 rounded">${r.error}</div>
+          <button onclick="resetWizard()" class="btn-secondary">Try Again</button>
+        `;
+      }
+    }
+
+    function resetWizard() {
+      document.getElementById('wizard-idle').style.display = 'block';
+      document.getElementById('wizard-running').style.display = 'none';
+      document.getElementById('wizard-result').style.display = 'none';
+    }
+
+    async function checkPipelineStatus() {
+      try {
+        const data = await apiGet('/run/status');
+        const badge = document.getElementById('pipeline-badge');
+        if (data.running) {
+          badge.textContent = 'Running';
+          badge.className = 'badge badge-red text-xs';
+        } else {
+          badge.textContent = 'Idle';
+          badge.className = 'badge badge-green text-xs';
+        }
+      } catch {}
+    }
+
+    function copySchedulerCommand() {
+      const root = 'C:\\Users\\Asus\\OneDrive\\Desktop\\Shorts Factory';
+      const cmd = `schtasks /create /tn "ShortsFactory_Noon" /tr "${root}\\run_daily.bat" /sc daily /st 12:00 /f`;
+      navigator.clipboard.writeText(cmd).then(() => toast('Command copied to clipboard!', 'success'));
+    }
+
+    // Spin animation
+    const style = document.createElement('style');
+    style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
