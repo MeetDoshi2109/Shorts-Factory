@@ -74,10 +74,7 @@ export default function App() {
 
   return (
     <PipelineContext.Provider value={{ running, runPipeline, session }}>
-      <BrowserRouter>
-        <Toaster position="bottom-right" toastOptions={{ 
-          style: { background: '#1a1a1a', color: '#fff', border: '1px solid #2a2a2a', fontSize: '13px' }
-        }} />
+
         <Routes>
           <Route path="/login" element={session ? <Navigate to="/" replace /> : <Login />} />
           <Route path="/*" element={
@@ -102,7 +99,6 @@ export default function App() {
             </RequireAuth>
           } />
         </Routes>
-      </BrowserRouter>
     </PipelineContext.Provider>
   )
 }
