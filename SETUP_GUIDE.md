@@ -2,214 +2,153 @@
 
 ## Overview
 
-This guide will get you from zero to automatically uploading YouTube Shorts in 15-20 minutes.
+This guide will get you from zero to a fully functional multi-tenant YouTube Shorts automation factory. The system is built on a **MERN + Supabase** architecture, featuring a Node.js/Express backend and a React (Vite + Tailwind v4) frontend.
 
 **What you need:**
-- Python 3.8+ (you likely have this)
+- Node.js (v18+)
+- Python 3.8+
 - FFmpeg (free video tool)
+- A Supabase account (free)
 - A Gemini API key (free)
 - A Google Cloud project (free) for YouTube API
-- A new YouTube channel/account
 
 ---
 
-## Step 1: Install FFmpeg
+## Step 1: Install Dependencies & Tools
 
-FFmpeg is required to render videos.
-
-1. Download from: https://www.gyan.dev/ffmpeg/builds/ → click **ffmpeg-release-essentials.zip**
-2. Extract to `C:\ffmpeg\`
-3. Add to PATH:
-   - Press `Win + S` → "Edit environment variables"
-   - Click "Environment Variables"
-   - Under "System variables", select "Path" → Edit
-   - Click "New" → paste `C:\ffmpeg\bin`
-   - Click OK everywhere
-4. Test: Open a new terminal → `ffmpeg -version` should show version info
-
----
-
-## Step 2: Get a Gemini API Key (Free)
-
-1. Go to: https://aistudio.google.com
-2. Sign in with your Google account
-3. Click **"Get API key"** → **"Create API key"**
-4. Copy the key (starts with `AIza...`)
-5. Open your `.env` file and paste it:
-   ```
-   GEMINI_API_KEY=AIzaXXXXXXXXXXXXXXXXXXXXXXX
-   ```
-
-**Free tier:** 15 requests/minute, 1 million tokens/day — more than enough!
-
----
-
-## Step 3: Set Up YouTube API Credentials
-
-### 3a. Create Google Cloud Project
-
-1. Go to: https://console.cloud.google.com
-2. Click the project dropdown → **"New Project"**
-3. Name it `shorts-factory` → Create
-
-### 3b. Enable APIs
-
-1. In your project, go to **APIs & Services** → **Library**
-2. Search for and enable **"YouTube Data API v3"** → Enable
-3. Search for and enable **"YouTube Analytics API"** → Enable
-
-### 3c. Configure OAuth Consent Screen
-
-1. Go to **APIs & Services** → **OAuth consent screen**
-2. Choose **External** → Create
-3. Fill in:
-   - App name: `Shorts Factory`
-   - User support email: your email
-   - Developer contact: your email
-4. Click **Save and Continue** through all steps
-5. On the last step, click **Back to Dashboard**
-6. Click **"Publish App"** → Confirm (this makes it usable without Google review)
-
-### 3d. Create OAuth2 Credentials
-
-1. Go to **APIs & Services** → **Credentials**
-2. Click **"+ Create Credentials"** → **"OAuth client ID"**
-3. Application type: **Desktop app**
-4. Name: `Shorts Factory Desktop`
-5. Click **Create**
-6. Note your **Client ID** and **Client Secret**
-7. Add to `.env`:
-   ```
-   YOUTUBE_CLIENT_ID=1234567890-xxxx.apps.googleusercontent.com
-   YOUTUBE_CLIENT_SECRET=GOCSPX-xxxxxxxxxx
+1. **Install Node.js & Python** if you haven't already.
+2. **Install FFmpeg**:
+   - Download from: https://www.gyan.dev/ffmpeg/builds/ → click **ffmpeg-release-essentials.zip**
+   - Extract to `C:\ffmpeg\`
+   - Add `C:\ffmpeg\bin` to your System PATH environment variable.
+3. Open a terminal and verify:
+   ```bash
+   node -v
+   python --version
+   ffmpeg -version
    ```
 
 ---
 
-## Step 4: Run Setup
+## Step 2: Set Up Supabase (Database & Auth)
 
-1. Double-click **`setup.bat`**
-2. It will:
-   - Check Python & FFmpeg
-   - Create a virtual environment
-   - Install all Python packages
-   - Create your `.env` from the template
+Shorts Factory uses Supabase for user authentication, storing settings, and tracking analytics securely per user (Multi-Tenant).
 
----
-
-## Step 5: Connect YouTube Account
-
-1. Make sure your `.env` has all credentials filled in
-2. Double-click **`authenticate_youtube.bat`**
-3. Your browser will open and ask you to:
-   - Sign in to your new YouTube account
-   - Grant permissions to Shorts Factory
-4. After authorization, you'll see "Authentication successful"
-5. A token is saved to `data/youtube_token.json` — it auto-refreshes
+1. Go to [Supabase](https://supabase.com) and create a new project.
+2. Go to **Project Settings → API** and copy:
+   - **Project URL**
+   - **anon public key**
+   - **service_role secret key**
+3. Open the **SQL Editor** in Supabase and run the provided SQL script to build the multi-tenant database schema with Row Level Security (RLS):
+   - Copy the contents of `supabase/schema.sql` from this project.
+   - Paste and run it in the SQL Editor.
 
 ---
 
-## Step 6: Launch Dashboard
+## Step 3: Configure Environment Variables
 
-1. Double-click **`start_dashboard.bat`**
-2. Browser opens at http://localhost:8899/frontend/index.html
-3. You'll see the Shorts Factory dashboard!
+Create `.env` files for both the root backend and the client frontend.
 
----
-
-## Step 7: Run Your First Short
-
-### Option A: Dashboard
-1. In the dashboard, click **"Run Now"** in the sidebar
-2. Or go to **New Short** → configure → click **"Start Pipeline"**
-
-### Option B: Command Line
+**Root Level (`/.env`):**
 ```
-cd "C:\Users\Asus\OneDrive\Desktop\Shorts Factory"
-venv\Scripts\activate
-python backend\main.py --dry-run    # Test without uploading
-python backend\main.py              # Full run
+# Express Server Config
+SERVER_PORT=8899
+
+# Supabase Admin Config (For Express Server)
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_KEY=your_supabase_service_role_key
+```
+
+**Client Level (`/client/.env`):**
+```
+# Frontend Supabase Config
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_public_key
 ```
 
 ---
 
-## Step 8: Set Up Automation (3×/day)
+## Step 4: Run Initial Setup
 
-Run this command in an administrator PowerShell to schedule 3 daily runs:
-
-```powershell
-$root = "C:\Users\Asus\OneDrive\Desktop\Shorts Factory"
-
-schtasks /create /tn "ShortsFactory_Noon" /tr "$root\run_daily.bat" /sc daily /st 12:00 /f
-schtasks /create /tn "ShortsFactory_5pm" /tr "$root\run_daily.bat" /sc daily /st 17:00 /f
-schtasks /create /tn "ShortsFactory_9pm" /tr "$root\run_daily.bat" /sc daily /st 21:00 /f
-```
+Double-click the **`setup.bat`** file in the root directory.
+This will:
+- Check for Node.js, Python, and FFmpeg
+- Install Node dependencies for the `server/`
+- Install Node dependencies for the `client/`
+- Create a Python virtual environment (`venv`) and install Python packages.
 
 ---
 
-## Project File Structure
+## Step 5: Launch the Application
 
-```
-Shorts Factory\
-├── backend\            ← Python automation engine
-│   ├── main.py         ← Full pipeline orchestrator
-│   ├── generate_content.py  ← AI script generation (Gemini)
-│   ├── generate_voice.py    ← Text-to-speech (gTTS)
-│   ├── generate_video.py    ← Video rendering (MoviePy)
-│   ├── upload_youtube.py    ← YouTube upload + OAuth2
-│   ├── fetch_analytics.py   ← YouTube Analytics API
-│   ├── server.py       ← Flask dashboard API server
-│   └── config.py       ← Central configuration
-├── frontend\
-│   └── index.html      ← Web dashboard
-├── output\             ← Generated videos (auto-created)
-├── data\               ← Persistent state
-│   ├── topics.md       ← Topic backlog
-│   ├── youtube_token.json   ← OAuth token (auto-created)
-│   └── analytics_cache.json ← Cached analytics
-├── logs\               ← Daily log files
-├── .env                ← Your credentials (NEVER commit this)
-├── setup.bat           ← One-click setup
-├── start_dashboard.bat ← Launch web UI
-├── run_daily.bat       ← Manual/scheduled pipeline run
-└── authenticate_youtube.bat ← YouTube OAuth setup
+1. Double-click **`start_all.bat`**.
+2. This script concurrently starts:
+   - The Express backend API on `http://localhost:8899`
+   - The React (Vite) frontend on `http://localhost:5173`
+3. Your browser will automatically open to the frontend.
+
+---
+
+## Step 6: Create Account & Add API Keys
+
+Because Shorts Factory is a multi-tenant cloud application, keys are tied to individual users rather than globally stored in a file.
+
+1. On the web dashboard, **Create an Account** (Sign Up).
+2. Once logged in, navigate to the **Account & Credentials** tab.
+3. Input your personal API Keys:
+   - **Gemini API Key**: Get a free one at [Google AI Studio](https://aistudio.google.com).
+   - **YouTube OAuth Credentials**: Follow the steps in Step 7 to create these.
+4. Click **Save Keys to Profile**. These are securely stored in your Supabase profile.
+
+---
+
+## Step 7: Set Up YouTube API Credentials (Optional, for Uploads)
+
+To allow Shorts Factory to upload videos and fetch analytics for a user:
+
+1. Go to: https://console.cloud.google.com and create a project (`shorts-factory`).
+2. Enable **"YouTube Data API v3"** and **"YouTube Analytics API"**.
+3. Configure the **OAuth consent screen** (External, fill required fields, Publish App).
+4. Go to **Credentials** → **Create Credentials** → **OAuth client ID**.
+5. Application type: **Desktop app**.
+6. Copy the **Client ID** and **Client Secret**.
+7. Paste these into the **Account** tab in the Shorts Factory dashboard.
+
+---
+
+## Project Architecture & Structure
+
+```text
+Shorts Factory/
+├── server/             ← Express.js Backend API
+│   ├── src/routes/     ← API endpoints (topics, settings, analytics, pipeline)
+│   └── package.json
+├── client/             ← React (Vite) Frontend SPA
+│   ├── src/pages/      ← Dashboard UI components
+│   └── vite.config.js
+├── backend/            ← Python Automation Scripts
+│   ├── main.py         ← Pipeline orchestrator
+│   ├── generate_content.py
+│   └── generate_video.py
+├── supabase/           
+│   └── schema.sql      ← Multi-tenant database schema definition
+├── .env                ← Root Server environment vars
+├── setup.bat           ← One-click dependency installer
+└── start_all.bat       ← Launches React frontend and Express backend
 ```
 
 ---
 
 ## Troubleshooting
 
-### "GEMINI_API_KEY not set"
-→ Make sure `.env` exists and has your key. Run `setup.bat` to create it.
+### Blank Screen / React Fails to Load
+Ensure you have created `client/.env` (or `.env.local`) with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, and that you have run `npm install` in the `client/` folder.
 
-### "YouTube OAuth error"
-→ Re-run `authenticate_youtube.bat`. Make sure your OAuth consent screen is published.
+### "JWT verification failed" / Cannot fetch topics
+Your Supabase Token may have expired, or you need to re-login. Make sure your Express backend `.env` has the correct `SUPABASE_SERVICE_KEY`.
 
-### "FFmpeg not found"
-→ Reinstall FFmpeg and make sure `C:\ffmpeg\bin` is in your system PATH.
-
-### "No module named X"
-→ Make sure you ran `setup.bat` and the venv is activated.
+### Python Pipeline Fails
+Ensure `FFmpeg` is in your Windows PATH and that `setup.bat` successfully created the virtual environment and installed the requirements.
 
 ### Videos rendering slowly
-→ Normal! CPU rendering takes 30-90 seconds. Videos are 1080×1920 @ 30fps.
-
-### "quota exceeded" from YouTube API
-→ YouTube Data API has 10,000 units/day free. Uploading 1 video costs ~1,600 units. 
-   For 3 uploads/day you use ~4,800 units — well within limits.
-
----
-
-## FAQ
-
-**Is this really free?**
-Yes! Gemini 1.5 Flash: free tier. gTTS: free. MoviePy/FFmpeg: free. YouTube Data API: 10K units/day free.
-
-**What niche should I use?**
-The default is personal finance. You can change `CHANNEL_NICHE` in `.env` or via the dashboard Settings page.
-
-**How long until I see views?**
-New channels take time. Consistency matters most — 3 Shorts/day for 30 days is a good start.
-
-**Can I customize the video style?**
-Yes! Edit `backend/generate_video.py` — change `PALETTES` for colors, font sizes, animations.
+Normal! CPU rendering via FFmpeg takes 30-90 seconds. Videos are generated at 1080×1920 @ 30fps.

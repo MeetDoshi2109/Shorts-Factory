@@ -67,6 +67,16 @@ app.get('/api/comments/:videoId', requireAuth, async (req, res) => {
 // Export app for serverless Vercel function
 export default app;
 
+// ─── Static Frontend Serving (For VPS Deployments) ─────────
+// When running on a VPS, serve the built React app from client/dist
+const clientDistPath = join(__dirname, '../../../client/dist');
+app.use(express.static(clientDistPath));
+
+// Catch-all route to serve React's index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(join(clientDistPath, 'index.html'));
+});
+
 // Listen only when run directly (not serverless)
 if (process.env.NODE_ENV !== 'production' || process.env.IS_LOCAL === 'true') {
   app.listen(PORT, () => {
