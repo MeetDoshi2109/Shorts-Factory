@@ -17,7 +17,13 @@ export default function Account() {
       setLoading(true)
       try {
         const s = await api.settings.get()
-        setSettings(s)
+        // Map database columns to local state
+        setSettings({
+          ...s,
+          GEMINI_API_KEY: s.gemini_api_key || '',
+          YOUTUBE_CLIENT_ID: s.youtube_client_id || '',
+          YOUTUBE_CLIENT_SECRET: s.youtube_client_secret || ''
+        })
       } catch {}
       setLoading(false)
     }
@@ -28,9 +34,9 @@ export default function Account() {
     setSaving(true)
     try {
       await api.settings.update({
-        GEMINI_API_KEY: settings.GEMINI_API_KEY || '',
-        YOUTUBE_CLIENT_ID: settings.YOUTUBE_CLIENT_ID || '',
-        YOUTUBE_CLIENT_SECRET: settings.YOUTUBE_CLIENT_SECRET || '',
+        gemini_api_key: settings.GEMINI_API_KEY || '',
+        youtube_client_id: settings.YOUTUBE_CLIENT_ID || '',
+        youtube_client_secret: settings.YOUTUBE_CLIENT_SECRET || '',
       })
       toast.success('API Keys updated successfully!')
     } catch (e) {
@@ -56,114 +62,74 @@ export default function Account() {
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-        {/* ── Section 1: YouTube Channel Status ──────────────────────────── */}
-        <div className="glass p-6">
+        {/* ── Section 1: API Keys Management ───────────────────────────── */}
+        <div className="glass p-6 xl:col-span-2">
           <h2 className="text-headline-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <UserCircle size={18} className="text-yt-red" /> YouTube Account Management
+            <Key size={18} className="text-yt-red" /> Personal API Keys
           </h2>
+          <p className="text-caption text-on-surface/50 mb-5">These keys are linked exclusively to your user account and are used to power AI generation and YouTube publishing.</p>
 
-          <div className="p-4 rounded-lg bg-surface-card border border-surface-high mb-5">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-caption text-on-surface/60 font-medium">OAuth Status</span>
-              {settings.youtube_authed ? (
-                <span className="badge badge-green flex items-center gap-1">
-                  <CheckCircle2 size={12} /> Connected & Authed
-                </span>
-              ) : (
-                <span className="badge badge-red flex items-center gap-1">
-                  <AlertTriangle size={12} /> Action Required
-                </span>
-              )}
-            </div>
-
-            <p className="text-caption text-on-surface/70 leading-relaxed mb-4">
-              Shorts Factory uses your Google OAuth2 credentials to upload generated Shorts and read channel analytics securely. Token auto-refreshes seamlessly.
-            </p>
-
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={handleAuthYoutube}
-              className="btn btn-primary w-full justify-center"
-            >
-              <RefreshCw size={14} /> Re-Authenticate YouTube Channel
-            </motion.button>
-          </div>
-
-          <div className="p-4 rounded-lg bg-surface-card/40 border border-surface-high/50 text-caption text-on-surface/50 space-y-2">
-            <div className="flex justify-between">
-              <span>Token Storage:</span>
-              <span className="font-mono text-white">data/youtube_token.json</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Configured Client ID:</span>
-              <span className="font-mono text-white">{settings.youtube_configured ? 'Yes (Valid)' : 'Missing'}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Section 2: API Keys Management ───────────────────────────── */}
-        <div className="glass p-6">
-          <h2 className="text-headline-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <Key size={18} className="text-yt-red" /> API Key Management
-          </h2>
-
-          <div className="space-y-4 mb-5">
-            {/* Gemini Key */}
-            <div>
-              <label className="text-caption text-on-surface/50 mb-1.5 flex justify-between font-medium">
-                <span>Gemini API Key (Free Tier)</span>
-                <a href="https://aistudio.google.com" target="_blank" rel="noreferrer" className="text-yt-red hover:underline flex items-center gap-1 text-label font-mono">
-                  Get Key <ExternalLink size={10} />
-                </a>
-              </label>
-              <div className="relative">
-                <input
-                  type={showGeminiKey ? 'text' : 'password'}
-                  className="input font-mono text-caption pr-10"
-                  placeholder="AIzaSy..."
-                  value={settings.GEMINI_API_KEY || ''}
-                  onChange={e => setSettings(s => ({ ...s, GEMINI_API_KEY: e.target.value }))}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowGeminiKey(!showGeminiKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface/30 hover:text-white"
-                >
-                  {showGeminiKey ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
+            <div className="space-y-4">
+              {/* Gemini Key */}
+              <div>
+                <label className="text-caption text-on-surface/50 mb-1.5 flex justify-between font-medium">
+                  <span>Gemini API Key (Free Tier)</span>
+                  <a href="https://aistudio.google.com" target="_blank" rel="noreferrer" className="text-yt-red hover:underline flex items-center gap-1 text-label font-mono">
+                    Get Key <ExternalLink size={10} />
+                  </a>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showGeminiKey ? 'text' : 'password'}
+                    className="input font-mono text-caption pr-10"
+                    placeholder="AIzaSy..."
+                    value={settings.GEMINI_API_KEY || ''}
+                    onChange={e => setSettings(s => ({ ...s, GEMINI_API_KEY: e.target.value }))}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowGeminiKey(!showGeminiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface/30 hover:text-white"
+                  >
+                    {showGeminiKey ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* YouTube Client ID */}
-            <div>
-              <label className="text-caption text-on-surface/50 mb-1.5 block font-medium">YouTube OAuth Client ID</label>
-              <input
-                type="text"
-                className="input font-mono text-caption"
-                placeholder="xxxx.apps.googleusercontent.com"
-                value={settings.YOUTUBE_CLIENT_ID || ''}
-                onChange={e => setSettings(s => ({ ...s, YOUTUBE_CLIENT_ID: e.target.value }))}
-              />
-            </div>
-
-            {/* YouTube Client Secret */}
-            <div>
-              <label className="text-caption text-on-surface/50 mb-1.5 block font-medium">YouTube OAuth Client Secret</label>
-              <div className="relative">
+            <div className="space-y-4">
+              {/* YouTube Client ID */}
+              <div>
+                <label className="text-caption text-on-surface/50 mb-1.5 block font-medium">YouTube OAuth Client ID</label>
                 <input
-                  type={showSecret ? 'text' : 'password'}
-                  className="input font-mono text-caption pr-10"
-                  placeholder="GOCSPX-..."
-                  value={settings.YOUTUBE_CLIENT_SECRET || ''}
-                  onChange={e => setSettings(s => ({ ...s, YOUTUBE_CLIENT_SECRET: e.target.value }))}
+                  type="text"
+                  className="input font-mono text-caption"
+                  placeholder="xxxx.apps.googleusercontent.com"
+                  value={settings.YOUTUBE_CLIENT_ID || ''}
+                  onChange={e => setSettings(s => ({ ...s, YOUTUBE_CLIENT_ID: e.target.value }))}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowSecret(!showSecret)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface/30 hover:text-white"
-                >
-                  {showSecret ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
+              </div>
+
+              {/* YouTube Client Secret */}
+              <div>
+                <label className="text-caption text-on-surface/50 mb-1.5 block font-medium">YouTube OAuth Client Secret</label>
+                <div className="relative">
+                  <input
+                    type={showSecret ? 'text' : 'password'}
+                    className="input font-mono text-caption pr-10"
+                    placeholder="GOCSPX-..."
+                    value={settings.YOUTUBE_CLIENT_SECRET || ''}
+                    onChange={e => setSettings(s => ({ ...s, YOUTUBE_CLIENT_SECRET: e.target.value }))}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSecret(!showSecret)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface/30 hover:text-white"
+                  >
+                    {showSecret ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -172,41 +138,21 @@ export default function Account() {
             whileTap={{ scale: 0.96 }}
             onClick={handleSaveEnvKeys}
             disabled={saving}
-            className="btn btn-secondary w-full justify-center"
+            className="btn btn-secondary w-full md:w-auto px-8 justify-center"
           >
-            <Save size={15} /> {saving ? 'Saving...' : 'Save All Keys'}
+            <Save size={15} /> {saving ? 'Saving...' : 'Save Keys to Profile'}
           </motion.button>
         </div>
 
-        {/* ── Section 3: Supabase Database Info ────────────────────────── */}
-        <div className="glass p-6">
+        {/* ── Section 2: Security ──────────────────────────────────────── */}
+        <div className="glass p-6 xl:col-span-2">
           <h2 className="text-headline-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <Database size={18} className="text-success" /> Supabase Database & Auth
-          </h2>
-          <div className="space-y-3 text-caption text-on-surface/70">
-            <div className="flex justify-between items-center p-3 rounded-lg bg-surface-card border border-surface-high">
-              <span>Supabase Connection</span>
-              <span className="badge badge-green font-mono">Connected</span>
-            </div>
-            <div className="flex justify-between items-center p-3 rounded-lg bg-surface-card border border-surface-high">
-              <span>Realtime Subscriptions</span>
-              <span className="badge badge-green font-mono">Active</span>
-            </div>
-            <div className="p-3 rounded-lg bg-surface-card/40 border border-surface-high/50 font-mono text-label text-on-surface/40">
-              Tables: videos, topics, runs, settings, analytics_snapshots
-            </div>
-          </div>
-        </div>
-
-        {/* ── Section 4: Security ──────────────────────────────────────── */}
-        <div className="glass p-6">
-          <h2 className="text-headline-sm font-semibold text-white mb-4 flex items-center gap-2">
-            <ShieldCheck size={18} className="text-info" /> Security & Privacy
+            <ShieldCheck size={18} className="text-info" /> Cloud Security & Privacy
           </h2>
           <p className="text-caption text-on-surface/60 mb-4 leading-relaxed">
-            All API keys and credentials are stored strictly on your local machine in the root <code className="font-mono text-white">.env</code> file. No keys are ever transmitted to external servers except directly to Google API endpoints.
+            Your API keys and credentials are stored securely in the cloud database. Row Level Security (RLS) ensures that only your authenticated user account can read or use these keys. They are never transmitted to external servers except directly to Google API endpoints for rendering and uploading.
           </p>
-          <div className="badge badge-gray text-caption">Local Environment Mode Enabled</div>
+          <div className="badge badge-green text-caption">Multi-Tenant Cloud Mode Enabled</div>
         </div>
 
       </div>
