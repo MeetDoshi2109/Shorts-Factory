@@ -1,77 +1,65 @@
-// src/lib/api.js — Typed API client for the Express server
-const BASE = '/api'
+// client/src/lib/api.js
+import { supabase } from './supabase'
 
-async function req(method, path, body) {
-  const opts = { method, headers: { 'Content-Type': 'application/json' } }
-  if (body) opts.body = JSON.stringify(body)
-  const res = await fetch(BASE + path, opts)
+const API_BASE = '/api'
+
+// Helper to get the JWT token for the current user
+async function getAuthHeaders() {
+  const { data: { session } } = await supabase.auth.getSession();
+  return {
+    'Content-Type': 'application/json',
+    ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
+  };
+}
+
+async function fetcher(url, options = {}) {
+  const headers = await getAuthHeaders();
+  const res = await fetch(`${API_BASE}${url}`, {
+    ...options,
+    headers: { ...headers, ...options.headers }
+  })
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
-    throw new Error(err.error || `HTTP ${res.status}`)
+    let msg = res.statusText
+    try { const err = await res.json(); msg = err.error || err.message || msg } catch {}
+    throw new Error(msg)
   }
   return res.json()
 }
 
 export const api = {
-  // Health
-  health: () => req('GET', '/health'),
-
-  // Pipeline
-  pipeline: {
-    status: () => req('GET', '/pipeline/status'),
-    run: (body) => req('POST', '/pipeline/run', body),
-    runs: (limit = 50) => req('GET', `/pipeline/runs?limit=${limit}`),
-    logsUrl: () => BASE + '/pipeline/logs',
-  },
-
-  // Topics
-  topics: {
-    list: () => req('GET', '/topics'),
-    add: (text) => req('POST', '/topics', { text }),
-    remove: (id) => req('DELETE', `/topics/${id}`),
-    generate: (niche) => req('POST', '/topics/generate', { niche }),
-  },
-
-  // Analytics
-  analytics: {
-    get: (days = 28, force = false) => req('GET', `/analytics?days=${days}&force=${force}`),
-    videos: (limit = 50) => req('GET', `/analytics/videos?limit=${limit}`),
-  },
-
-  // Settings
   settings: {
-    get: () => req('GET', '/settings'),
-    update: (data) => req('PUT', '/settings', data),
-    authYoutube: () => req('POST', '/settings/auth-youtube'),
+    get: () => fetcher('/settings'),
+    update: (data) => fetcher('/settings', { method: 'PUT', body: JSON.stringify(data) }),
+    authYoutube: () => fetcher('/settings/auth-youtube', { method: 'POST' }),
   },
+  pipeline: {
+    runs: (limit = 20) => fetcher(`/pipeline/runs?limit=${limit}`),
+    run: () => fetcher('/pipeline/run', { method: 'POST' }),
+    logsUrl: () => `${API_BASE}/pipeline/logs`, // Note: SSE auth is tricky, bypassing for now
+  },
+  topics: {
+    list: () => fetcher('/topics'),
+    add: (text) => fetcher('/topics', { method: 'POST', body: JSON.stringify({ text }) }),
+    remove: (id) => fetcher(`/topics/${id}`, { method: 'DELETE' }),
+    generate: (niche) => fetcher('/topics/generate', { method: 'POST', body: JSON.stringify({ niche }) }),
+  },
+  analytics: {
+    get: (days = 28, force = false) => fetcher(`/analytics?days=${days}&force=${force}`),
+    videos: (limit = 50) => fetcher(`/analytics/videos?limit=${limit}`),
+  }
 }
 
-// ── Number formatters ──────────────────────────────────────────────────────
-export const fmt = (n) => {
-  n = Number(n) || 0
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M'
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K'
-  return n.toLocaleString()
+export const fmt = (num) => new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(num || 0)
+export const fmtDate = (str) => {
+  if (!str) return ''
+  return new Date(str).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
-
-export const fmtDate = (iso) => {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-}
-
-export const fmtRelative = (iso) => {
-  if (!iso) return '—'
-  const diff = Date.now() - new Date(iso).getTime()
-  const s = Math.floor(diff / 1000)
-  if (s < 60) return `${s}s ago`
-  if (s < 3600) return `${Math.floor(s / 60)}m ago`
-  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-  return `${Math.floor(s / 86400)}d ago`
-}
-
-export const fmtDuration = (seconds) => {
-  if (!seconds) return '0:00'
-  const m = Math.floor(seconds / 60)
-  const s = Math.floor(seconds % 60)
-  return `${m}:${s.toString().padStart(2, '0')}`
+export const fmtRelative = (str) => {
+  if (!str) return ''
+  const diff = Date.now() - new Date(str).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  return `${Math.floor(h / 24)}d ago`
 }
