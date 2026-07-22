@@ -1,15 +1,25 @@
 -- ════════════════════════════════════════════════════════════════
--- Shorts Factory — Supabase Schema
+-- Shorts Factory — Multi-Tenant Supabase Schema
 -- Run this in your Supabase SQL Editor to create all tables
+-- WARNING: This will drop existing single-tenant tables.
 -- ════════════════════════════════════════════════════════════════
 
 -- Enable UUID generation
 create extension if not exists "uuid-ossp";
 
+-- Drop existing tables to start fresh for multi-tenant (or migrate manually)
+drop table if exists public.analytics_snapshots cascade;
+drop table if exists public.settings cascade;
+drop table if exists public.user_settings cascade;
+drop table if exists public.runs cascade;
+drop table if exists public.topics cascade;
+drop table if exists public.videos cascade;
+
 -- ─── Videos ─────────────────────────────────────────────────────────────────
-create table if not exists public.videos (
+create table public.videos (
   id            uuid default uuid_generate_v4() primary key,
-  video_id      text unique not null,        -- YouTube video ID
+  user_id       uuid references auth.users not null,
+  video_id      text not null,        -- YouTube video ID
   title         text not null,
   topic         text,
   description   text,
@@ -21,47 +31,27 @@ create table if not exists public.videos (
   published_at  timestamptz,
   privacy       text default 'public',
   run_id        text,
-  created_at    timestamptz default now()
+  created_at    timestamptz default now(),
+  unique(user_id, video_id)
 );
 
 -- ─── Topics ──────────────────────────────────────────────────────────────────
-create table if not exists public.topics (
+create table public.topics (
   id         uuid default uuid_generate_v4() primary key,
-  text       text unique not null,
+  user_id    uuid references auth.users not null,
+  text       text not null,
   used       boolean default false,
   used_at    timestamptz,
-  score      int,                            -- virality gate score
-  added_at   timestamptz default now()
+  score      int,
+  added_at   timestamptz default now(),
+  unique(user_id, text)
 );
 
--- Insert default topics
-insert into public.topics (text) values
-  ('The hidden fees that drain your bank account every month'),
-  ('Why your savings account is losing you money (inflation math)'),
-  ('The 50-30-20 budget rule — does it actually work?'),
-  ('Credit score myths that cost people thousands'),
-  ('The one financial mistake millennials keep making'),
-  ('How compound interest really works (with real numbers)'),
-  ('Why you should never carry a credit card balance'),
-  ('Emergency fund: how much is actually enough?'),
-  ('Side hustles that actually make money vs. hype'),
-  ('The true cost of buying vs. renting right now'),
-  ('Dollar-cost averaging explained in 60 seconds'),
-  ('The 3 accounts everyone should have before 30'),
-  ('Why your car payment is destroying your wealth'),
-  ('Index funds vs. picking stocks — what the data shows'),
-  ('How to negotiate your salary (scripts that work)'),
-  ('The subscription audit that could save you $200/month'),
-  ('Why most people never get a raise (and how to fix it)'),
-  ('401k mistakes that cost you a fortune at retirement'),
-  ('The snowball vs. avalanche debt payoff method'),
-  ('Roth IRA vs. Traditional IRA — which is right for you?')
-on conflict (text) do nothing;
-
 -- ─── Pipeline Runs ───────────────────────────────────────────────────────────
-create table if not exists public.runs (
+create table public.runs (
   id               uuid default uuid_generate_v4() primary key,
-  run_id           text unique not null,
+  user_id          uuid references auth.users not null,
+  run_id           text not null,
   topic            text,
   title            text,
   status           text default 'pending',  -- pending | running | success | failed
@@ -73,28 +63,38 @@ create table if not exists public.runs (
   error            text,
   dry_run          boolean default false,
   gate_score       int,
-  gate_verdict     text
+  gate_verdict     text,
+  unique(user_id, run_id)
 );
 
--- ─── Settings ────────────────────────────────────────────────────────────────
-create table if not exists public.settings (
-  key        text primary key,
-  value      text,
-  updated_at timestamptz default now()
+-- ─── User Settings ───────────────────────────────────────────────────────────
+create table public.user_settings (
+  user_id        uuid references auth.users primary key,
+  
+  -- API Keys (Note: In a production app, these should be encrypted)
+  gemini_api_key         text,
+  youtube_client_id      text,
+  youtube_client_secret  text,
+  
+  -- Preferences
+  channel_niche          text default 'personal finance',
+  channel_target_audience text default 'young adults 18-35',
+  upload_privacy         text default 'public',
+  daily_upload_count     text default '3',
+  video_duration_max     text default '58',
+  
+  -- Goals
+  target_subs            text default '1000',
+  target_views           text default '100000',
+  target_uploads         text default '30',
+  
+  updated_at             timestamptz default now()
 );
-
--- Insert defaults
-insert into public.settings (key, value) values
-  ('CHANNEL_NICHE', 'personal finance'),
-  ('CHANNEL_TARGET_AUDIENCE', 'young adults 18-35'),
-  ('UPLOAD_PRIVACY', 'public'),
-  ('DAILY_UPLOAD_COUNT', '3'),
-  ('VIDEO_DURATION_MAX', '58')
-on conflict (key) do update set value = excluded.value;
 
 -- ─── Analytics Snapshots ─────────────────────────────────────────────────────
-create table if not exists public.analytics_snapshots (
+create table public.analytics_snapshots (
   id            uuid default uuid_generate_v4() primary key,
+  user_id       uuid references auth.users not null,
   period_days   int default 28,
   total_views   bigint default 0,
   total_subs    bigint default 0,
@@ -107,11 +107,52 @@ create table if not exists public.analytics_snapshots (
   fetched_at    timestamptz default now()
 );
 
--- ─── Row Level Security (optional, enable if using Supabase Auth) ────────────
--- alter table public.videos enable row level security;
--- alter table public.topics enable row level security;
--- alter table public.runs enable row level security;
--- alter table public.settings enable row level security;
+-- ─── Row Level Security (RLS) ────────────────────────────────────────────────
+alter table public.videos enable row level security;
+alter table public.topics enable row level security;
+alter table public.runs enable row level security;
+alter table public.user_settings enable row level security;
+alter table public.analytics_snapshots enable row level security;
+
+-- Policies: Users can only select, insert, update, delete their own data
+create policy "Users can view own videos" on public.videos for select using (auth.uid() = user_id);
+create policy "Users can insert own videos" on public.videos for insert with check (auth.uid() = user_id);
+create policy "Users can update own videos" on public.videos for update using (auth.uid() = user_id);
+create policy "Users can delete own videos" on public.videos for delete using (auth.uid() = user_id);
+
+create policy "Users can view own topics" on public.topics for select using (auth.uid() = user_id);
+create policy "Users can insert own topics" on public.topics for insert with check (auth.uid() = user_id);
+create policy "Users can update own topics" on public.topics for update using (auth.uid() = user_id);
+create policy "Users can delete own topics" on public.topics for delete using (auth.uid() = user_id);
+
+create policy "Users can view own runs" on public.runs for select using (auth.uid() = user_id);
+create policy "Users can insert own runs" on public.runs for insert with check (auth.uid() = user_id);
+create policy "Users can update own runs" on public.runs for update using (auth.uid() = user_id);
+create policy "Users can delete own runs" on public.runs for delete using (auth.uid() = user_id);
+
+create policy "Users can view own settings" on public.user_settings for select using (auth.uid() = user_id);
+create policy "Users can insert own settings" on public.user_settings for insert with check (auth.uid() = user_id);
+create policy "Users can update own settings" on public.user_settings for update using (auth.uid() = user_id);
+create policy "Users can delete own settings" on public.user_settings for delete using (auth.uid() = user_id);
+
+create policy "Users can view own analytics" on public.analytics_snapshots for select using (auth.uid() = user_id);
+create policy "Users can insert own analytics" on public.analytics_snapshots for insert with check (auth.uid() = user_id);
+create policy "Users can update own analytics" on public.analytics_snapshots for update using (auth.uid() = user_id);
+create policy "Users can delete own analytics" on public.analytics_snapshots for delete using (auth.uid() = user_id);
+
+-- Trigger to create user_settings row on signup
+create or replace function public.handle_new_user() 
+returns trigger as $$
+begin
+  insert into public.user_settings (user_id)
+  values (new.id);
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
 
 -- ─── Realtime (enable for live updates) ──────────────────────────────────────
 -- In Supabase Dashboard: Database → Replication → enable runs, videos tables

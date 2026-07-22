@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { supabase } from './lib/supabase.js';
 
 import pipelineRouter from './routes/pipeline.js';
 import topicsRouter from './routes/topics.js';
@@ -20,11 +21,28 @@ const PORT = process.env.SERVER_PORT || process.env.PORT || 8899;
 app.use(cors({ origin: '*' }));
 app.use(express.json({ limit: '10mb' }));
 
+// Auth Middleware: Verifies Supabase JWT token
+const requireAuth = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Missing Authorization header' });
+
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  
+  if (error || !user) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
+  req.user = user; // attach user object to request
+  next();
+};
+
 // ─── Routes ────────────────────────────────────────────────────────────────
-app.use('/api/pipeline', pipelineRouter);
-app.use('/api/topics', topicsRouter);
-app.use('/api/analytics', analyticsRouter);
-app.use('/api/settings', settingsRouter);
+// Apply auth middleware to all protected routes
+app.use('/api/pipeline', requireAuth, pipelineRouter);
+app.use('/api/topics', requireAuth, topicsRouter);
+app.use('/api/analytics', requireAuth, analyticsRouter);
+app.use('/api/settings', requireAuth, settingsRouter);
 
 // ─── Health Check ──────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => {
@@ -32,16 +50,12 @@ app.get('/api/health', (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     version: '2.0.0',
-    env: {
-      gemini: !!process.env.GEMINI_API_KEY,
-      youtube: !!(process.env.YOUTUBE_CLIENT_ID && process.env.YOUTUBE_CLIENT_SECRET),
-      supabase: !!process.env.SUPABASE_URL,
-    },
+    multi_tenant: true
   });
 });
 
 // ─── Comments proxy ───────────────────────────────────────────────────────
-app.get('/api/comments/:videoId', async (req, res) => {
+app.get('/api/comments/:videoId', requireAuth, async (req, res) => {
   const { videoId } = req.params;
   res.json({
     videoId,
@@ -57,7 +71,7 @@ export default app;
 if (process.env.NODE_ENV !== 'production' || process.env.IS_LOCAL === 'true') {
   app.listen(PORT, () => {
     console.log(`\n${'─'.repeat(50)}`);
-    console.log(`  Shorts Factory Server  →  http://localhost:${PORT}`);
+    console.log(`  Shorts Factory Server (Multi-Tenant) →  http://localhost:${PORT}`);
     console.log(`${'─'.repeat(50)}\n`);
   });
 }
