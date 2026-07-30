@@ -16,7 +16,8 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # Add parent dir to path for config import
 sys.path.insert(0, str(Path(__file__).parent))
@@ -25,37 +26,36 @@ import config
 log = logging.getLogger(__name__)
 
 # ─── Gemini Setup ────────────────────────────────────────────────────────────
-def _get_model():
+def _get_client():
     if not config.GEMINI_API_KEY:
         raise RuntimeError("GEMINI_API_KEY not set. See .env.example")
-    genai.configure(api_key=config.GEMINI_API_KEY)
-    return genai.GenerativeModel(config.GEMINI_MODEL)
+    return genai.Client(api_key=config.GEMINI_API_KEY)
 
 
 # ─── Topic Management ────────────────────────────────────────────────────────
 DEFAULT_TOPICS = """# Shorts Topic Backlog
 
-## Personal Finance Topics
-- The hidden fees that drain your bank account every month
-- Why your savings account is losing you money (inflation math)
-- The 50-30-20 budget rule — does it actually work?
-- Credit score myths that cost people thousands
-- The one financial mistake millennials keep making
-- How compound interest really works (with real numbers)
-- Why you should never carry a credit card balance
-- Emergency fund: how much is actually enough?
-- Side hustles that actually make money vs. hype
-- The true cost of buying vs. renting right now
-- Dollar-cost averaging explained in 60 seconds
-- The 3 accounts everyone should have before 30
-- Why your car payment is destroying your wealth
-- Index funds vs. picking stocks — what the data shows
-- How to negotiate your salary (scripts that work)
-- The subscription audit that could save you $200/month
-- Why most people never get a raise (and how to fix it)
-- 401k mistakes that cost you a fortune at retirement
-- The snowball vs. avalanche debt payoff method
-- Roth IRA vs. Traditional IRA — which is right for you?
+## Easy Daily Hacks Topics
+- The 2-second trick to slice cherry tomatoes like a chef
+- Why you should freeze your grapes before putting them in drinks
+- How to peel a hard-boiled egg in seconds with a jar of water
+- The keyboard shortcut that restores closed tabs instantly
+- Use a binder clip to organize all your charger cables
+- How to get rid of smelly shoes using dry tea bags overnight
+- The easiest way to clean a microwave with just lemon and water
+- Why you should store your natural peanut butter upside down
+- How to check if a battery is dead using the bounce test
+- The simple phone camera trick to read tiny text instantly
+- Keep your bananas fresh for a week by wrapping the stems in plastic
+- How to open a tight jar lid using a simple rubber band
+- Use a post-it note to clean between your keyboard keys
+- The absolute best way to fold a fitted sheet without losing your mind
+- How to dry clothes 2x faster by adding a dry towel to the dryer
+- Use a wooden spoon over a pot of boiling water to stop it from boiling over
+- The fast trick to thread a needle using your palm
+- Why you should put a piece of bread in your cookie jar to keep them soft
+- Stop your cutting board from sliding around using a damp paper towel
+- The easy way to remove water rings from wood using a hair dryer
 """
 
 def load_topics() -> list[str]:
@@ -134,8 +134,8 @@ def generate_script(topic: str = None) -> dict:
         topic=topic,
     )
 
-    model = _get_model()
-    response = model.generate_content(prompt)
+    client = _get_client()
+    response = client.models.generate_content(model=config.GEMINI_MODEL, contents=prompt)
     raw = response.text.strip()
 
     # Strip any markdown code fences if present
@@ -179,9 +179,9 @@ Use "PASS" if score >= 6, "FAIL" if score < 6.
 
 def virality_gate(topic: str) -> dict:
     """Check if a topic passes the virality gate before producing video."""
-    model = _get_model()
+    client = _get_client()
     prompt = GATE_PROMPT.format(topic=topic, niche=config.CHANNEL_NICHE)
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(model=config.GEMINI_MODEL, contents=prompt)
     raw = response.text.strip()
     raw = re.sub(r"^```(?:json)?\n?", "", raw)
     raw = re.sub(r"\n?```$", "", raw)

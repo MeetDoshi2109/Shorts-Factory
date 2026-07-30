@@ -29,6 +29,7 @@ from moviepy.editor import (
     ImageClip,
     TextClip,
     VideoFileClip,
+    VideoClip,
     concatenate_videoclips,
 )
 
@@ -173,6 +174,143 @@ def render_frame(
     return np.array(img)
 
 
+def render_dynamic_frame(
+    t: float,
+    text: str,
+    scene_index: int,
+    total_scenes: int,
+    palette: dict,
+    scene_dur: float,
+    width: int = W,
+    height: int = H,
+    show_progress: bool = True,
+) -> np.ndarray:
+    """
+    Render a single dynamic video frame as a numpy array (RGB) with a moving gradient,
+    floating particles, dynamic text background card, and word-by-word highlighted active subtitles.
+    """
+    bg_rgb = hex_to_rgb(palette["bg"])
+    accent_rgb = hex_to_rgb(palette["accent"])
+    text_rgb = hex_to_rgb(palette["text"])
+    sub_rgb = hex_to_rgb(palette["sub"])
+
+    # 1. Flowing background gradient
+    img = Image.new("RGB", (width, height), bg_rgb)
+    draw = ImageDraw.Draw(img)
+
+    # Shift gradient coordinates slowly over time t
+    flow_speed = 1.0
+    shift = 0.08 * math.sin(t * flow_speed + scene_index)
+
+    for y in range(height):
+        ratio = y / height
+        blend = ratio * (0.08 + shift)
+        r = int(bg_rgb[0] + (accent_rgb[0] - bg_rgb[0]) * blend)
+        g = int(bg_rgb[1] + (accent_rgb[1] - bg_rgb[1]) * blend)
+        b = int(bg_rgb[2] + (accent_rgb[2] - bg_rgb[2]) * blend)
+        draw.line([(0, y), (width, y)], fill=(r, g, b))
+
+    # Create overlay for alpha blending (floating particles, backdrop card)
+    overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    overlay_draw = ImageDraw.Draw(overlay)
+
+    # 2. Draw Floating Particles/Circles
+    num_particles = 4
+    for p in range(num_particles):
+        speed_x = 0.5 + p * 0.2
+        speed_y = 0.4 + p * 0.3
+        amp_x = 120 + p * 40
+        amp_y = 180 + p * 30
+        
+        base_x = width // 2 + (p - 1.5) * 150
+        base_y = height // 2 + (p - 1.5) * 200
+        
+        cx = int(base_x + amp_x * math.sin(t * speed_x + scene_index + p))
+        cy = int(base_y + amp_y * math.cos(t * speed_y + scene_index - p))
+        
+        radius = 80 + p * 20
+        color_with_alpha = (accent_rgb[0], accent_rgb[1], accent_rgb[2], 25)
+        overlay_draw.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], fill=color_with_alpha)
+
+    # 3. Dynamic Text Backdrop Card
+    card_w = width - 120
+    card_h = 340
+    card_x0 = 60
+    card_y0 = height // 2 - 170
+    card_x1 = width - 60
+    card_y1 = height // 2 + 170
+    
+    overlay_draw.rounded_rectangle([card_x0, card_y0, card_x1, card_y1], radius=24, fill=(0, 0, 0, 160))
+
+    # Blend overlay with base image
+    img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    # 4. Accent top bar
+    bar_h = 12
+    draw.rectangle([0, 0, width, bar_h], fill=accent_rgb)
+
+    # 5. Progress Bar (Modern fill style at the bottom of the card)
+    progress_w = int((card_w - 40) * (t / scene_dur))
+    bar_x0 = card_x0 + 20
+    bar_y0 = card_y1 - 25
+    bar_x1 = bar_x0 + progress_w
+    bar_y1 = bar_y0 + 6
+    draw.rounded_rectangle([bar_x0, bar_y0, card_x1 - 20, bar_y1], radius=3, fill=(sub_rgb[0], sub_rgb[1], sub_rgb[2], 50))
+    if progress_w > 0:
+        draw.rounded_rectangle([bar_x0, bar_y0, bar_x1, bar_y1], radius=3, fill=accent_rgb)
+
+    # 6. Word-by-word animated subtitles
+    words = text.split()
+    if not words:
+        words = [text]
+
+    active_idx = min(len(words) - 1, int(t / scene_dur * len(words)))
+    
+    # Word bounce timing
+    w_dur = scene_dur / len(words)
+    w_t = (t % w_dur) / w_dur
+    bounce = 1.0 + 0.20 * math.sin(w_t * math.pi)
+
+    font_active = _load_font(int(80 * bounce), bold=True)
+    font_sub = _load_font(52, bold=False)
+
+    # Draw active word centered
+    active_word = words[active_idx].upper()
+    shadow = 4
+    bbox = draw.textbbox((0, 0), active_word, font=font_active)
+    tw = bbox[2] - bbox[0]
+    tx = (width - tw) // 2
+    ty = height // 2 - 50
+
+    # Drop shadow
+    draw.text((tx + shadow, ty + shadow), active_word, font=font_active, fill=(0, 0, 0))
+    draw.text((tx, ty), active_word, font=font_active, fill=accent_rgb)
+
+    # Draw previous word (above)
+    if active_idx > 0:
+        prev_word = words[active_idx - 1]
+        bbox_p = draw.textbbox((0, 0), prev_word, font=font_sub)
+        tx_p = (width - (bbox_p[2] - bbox_p[0])) // 2
+        ty_p = ty - 80
+        draw.text((tx_p, ty_p), prev_word, font=font_sub, fill=(255, 255, 255, 120))
+
+    # Draw next word (below)
+    if active_idx < len(words) - 1:
+        next_word = words[active_idx + 1]
+        bbox_n = draw.textbbox((0, 0), next_word, font=font_sub)
+        tx_n = (width - (bbox_n[2] - bbox_n[0])) // 2
+        ty_n = ty + 120
+        draw.text((tx_n, ty_n), next_word, font=font_sub, fill=(255, 255, 255, 120))
+
+    # 7. Scene indicator
+    scene_label = f"  {scene_index + 1} / {total_scenes}  "
+    font_small = _load_font(32)
+    draw.text((width // 2 - 40, height - 140), scene_label, font=font_small, fill=sub_rgb)
+
+    return np.array(img)
+
+
 def render_title_frame(title: str, palette: dict) -> np.ndarray:
     """Render an intro title card."""
     bg_rgb = hex_to_rgb(palette["bg"])
@@ -293,13 +431,15 @@ def create_video(
 
     # ── Body scenes ────────────────────────────────────────────────────────────
     for i, scene_text in enumerate(scenes):
-        frame = render_frame(
-            text=scene_text,
-            scene_index=i,
+        make_frame = lambda t, txt=scene_text, idx=i: render_dynamic_frame(
+            t=t,
+            text=txt,
+            scene_index=idx,
             total_scenes=len(scenes),
             palette=palette,
+            scene_dur=scene_dur,
         )
-        clip = ImageClip(frame, duration=scene_dur).set_fps(config.VIDEO_FPS)
+        clip = VideoClip(make_frame, duration=scene_dur).set_fps(config.VIDEO_FPS)
         clips.append(clip)
 
     # ── CTA frame ──────────────────────────────────────────────────────────────

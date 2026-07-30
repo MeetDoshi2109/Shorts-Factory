@@ -31,6 +31,12 @@ from generate_voice import get_audio_duration, text_to_speech
 from generate_video import create_video
 from upload_youtube import upload_short
 
+# Reconfigure stdout/stderr to use UTF-8 on Windows
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 # ─── Logging Setup ───────────────────────────────────────────────────────────
 LOG_FILE = config.LOGS_DIR / f"run_{datetime.now().strftime('%Y%m%d')}.log"
 logging.basicConfig(

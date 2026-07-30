@@ -250,8 +250,8 @@ if __name__ == "__main__":
         # Auth-only test
         print("Testing YouTube auth (browser will open if first time)...")
         creds = get_credentials()
-        print("✓ Auth successful!")
+        print("[OK] Auth successful!")
         info = get_channel_info()
         if info:
             print(f"  Channel: {info.get('title')}")
-            print(f"  Subscribers: {info.get('subscribers'):,}")
+            print(f"  Subscribers: {info.get('subscribers', 0):,}")

@@ -17,7 +17,7 @@ echo   (See SETUP_GUIDE.md)
 echo.
 pause
 
-call "%ROOT%\venv\Scripts\activate.bat"
+call "C:\sf_venv\Scripts\activate.bat"
 python "%ROOT%\backend\upload_youtube.py"
 
 echo.

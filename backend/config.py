@@ -19,7 +19,7 @@ else:
 
 # ─── Gemini AI ───────────────────────────────────────────────────────────────
 GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-GEMINI_MODEL: str = "gemini-1.5-flash"          # Free tier model
+GEMINI_MODEL: str = "gemini-3.5-flash"          # Active standard model
 
 # ─── YouTube OAuth2 ──────────────────────────────────────────────────────────
 YOUTUBE_CLIENT_ID: str = os.getenv("YOUTUBE_CLIENT_ID", "")
@@ -89,6 +89,6 @@ if __name__ == "__main__":
     print(f"  Niche        : {CHANNEL_NICHE}")
     print(f"  Gemini key   : {'✓ SET' if GEMINI_API_KEY else '✗ MISSING'}")
     print(f"  YT Client ID : {'✓ SET' if YOUTUBE_CLIENT_ID else '✗ MISSING'}")
-    print(f"  YT token     : {'✓ EXISTS' if YOUTUBE_TOKEN_FILE.exists() else '✗ not yet auth'd'}")
+    print(f"  YT token     : {'✓ EXISTS' if YOUTUBE_TOKEN_FILE.exists() else '✗ not yet authed'}")
     print(f"  Output dir   : {OUTPUT_DIR}")
     validate()
